@@ -1,0 +1,26 @@
+.loading {
+  flex: 1;
+}
+
+.error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-muted);
+  text-transform: uppercase;
+}
+
+.app {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background-color: var(--color-bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

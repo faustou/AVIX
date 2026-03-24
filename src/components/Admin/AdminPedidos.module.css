@@ -1,0 +1,121 @@
+.container {
+  padding: 24px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.filterBtn {
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  color: #999;
+  margin-bottom: -1px;
+}
+
+.filterBtn[data-active='true'] {
+  color: #000;
+  border-bottom-color: #000;
+}
+
+.loading {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #666;
+  padding: 24px 0;
+}
+
+.error {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #c00;
+  padding: 12px 0;
+}
+
+.empty {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #999;
+  padding: 24px 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 2px solid #000;
+  white-space: nowrap;
+}
+
+.tr {
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.tr:hover {
+  background: #fafafa;
+}
+
+.td {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.badge_pending {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: #f0f0f0;
+  color: #555;
+}
+
+.badge_paid {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge_failed {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  background: #f8d7da;
+  color: #721c24;
+}

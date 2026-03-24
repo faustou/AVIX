@@ -1,0 +1,101 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  background-color: var(--color-bg);
+  width: 100%;
+}
+
+.nav[data-overlay='true'] {
+  z-index: 150;
+}
+
+/* ── Left / Right slots ── */
+
+.left,
+.right {
+  width: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+.right {
+  justify-content: flex-end;
+}
+
+/* ── Cycle button ── */
+
+.cycleButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+}
+
+/* ── Icon buttons (← and cart) ── */
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+}
+
+/* ── Center categories ── */
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+
+.row {
+  display: flex;
+  gap: 14px;
+}
+
+.category {
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: #555555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-fast);
+}
+
+.category[data-active='true'] {
+  color: var(--color-text);
+}
+
+/* ── Cart count badge ── */
+
+.cartCount {
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  letter-spacing: 0;
+  color: var(--color-text);
+  line-height: 1;
+}

@@ -1,0 +1,124 @@
+/* ── Slide animations ── */
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
+/* ── Panel ── */
+
+.panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--color-bg);
+  padding: 20px 20px 40px;
+  animation: slideUp 300ms ease forwards;
+}
+
+.panel[data-open='false'] {
+  animation: slideDown 300ms ease forwards;
+}
+
+/* ── Header ── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.headerTitle {
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.headerButton {
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.headerPlaceholder {
+  width: 24px;
+}
+
+/* ── Price ── */
+
+.price {
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+/* ── Sizes grid ── */
+
+@keyframes sizeAppear {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.size {
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-text);
+  background: none;
+  border: 1px solid var(--color-text);
+  cursor: pointer;
+  padding: 8px 12px;
+  animation: sizeAppear 250ms ease both;
+  transition: opacity var(--transition-fast);
+}
+
+.size:disabled {
+  color: var(--color-muted);
+  border-color: var(--color-muted);
+  text-decoration: line-through;
+  cursor: default;
+}
+
+/* Stagger delays — up to 10 sizes */
+.size:nth-child(1)  { animation-delay: 0ms; }
+.size:nth-child(2)  { animation-delay: 40ms; }
+.size:nth-child(3)  { animation-delay: 80ms; }
+.size:nth-child(4)  { animation-delay: 120ms; }
+.size:nth-child(5)  { animation-delay: 160ms; }
+.size:nth-child(6)  { animation-delay: 200ms; }
+.size:nth-child(7)  { animation-delay: 240ms; }
+.size:nth-child(8)  { animation-delay: 280ms; }
+.size:nth-child(9)  { animation-delay: 320ms; }
+.size:nth-child(10) { animation-delay: 360ms; }

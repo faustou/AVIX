@@ -1,0 +1,46 @@
+.page {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-main);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.message {
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-muted);
+}
+
+.btn {
+  margin-top: 8px;
+  display: inline-block;
+  padding: 12px 24px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  text-decoration: none;
+}
