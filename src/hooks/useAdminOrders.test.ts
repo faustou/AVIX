@@ -6,10 +6,12 @@ const mockChain = vi.hoisted(() => {
     select: vi.fn(),
     eq: vi.fn(),
     order: vi.fn(),
+    update: vi.fn(),
   }
   chain.select.mockReturnValue(chain)
   chain.eq.mockReturnValue(chain)
   chain.order.mockResolvedValue({ data: [], error: null })
+  chain.update.mockReturnValue(chain)
   return chain
 })
 
@@ -53,6 +55,7 @@ beforeEach(() => {
   mockChain.select.mockReset().mockReturnValue(mockChain)
   mockChain.eq.mockReset().mockReturnValue(mockChain)
   mockChain.order.mockReset().mockResolvedValue({ data: [], error: null })
+  mockChain.update.mockReset().mockReturnValue(mockChain)
 })
 
 describe('useAdminOrders', () => {
@@ -125,5 +128,73 @@ describe('useAdminOrders', () => {
 
     expect(mockChain.order.mock.calls.length).toBeGreaterThan(callsBefore)
     expect(result.current.orders).toHaveLength(2)
+  })
+
+  it('updateOrderStatus llama a supabase.update con el status correcto', async () => {
+    mockChain.eq.mockResolvedValueOnce({ error: null })
+    const { result } = renderHook(() => useAdminOrders())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    mockChain.eq.mockResolvedValueOnce({ error: null })
+    await act(async () => {
+      await result.current.updateOrderStatus('o1', 'paid')
+    })
+
+    expect(mockChain.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'paid' }))
+    expect(mockChain.eq).toHaveBeenCalledWith('id', 'o1')
+  })
+
+  it('updateOrderStatus con status="shipped" incluye shipped_at', async () => {
+    const { result } = renderHook(() => useAdminOrders())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    mockChain.eq.mockResolvedValueOnce({ error: null })
+    await act(async () => {
+      await result.current.updateOrderStatus('o1', 'shipped')
+    })
+
+    expect(mockChain.update).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'shipped', shipped_at: expect.any(String) }),
+    )
+  })
+
+  it('updateOrderStatus con tracking number lo incluye en el update', async () => {
+    const { result } = renderHook(() => useAdminOrders())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    mockChain.eq.mockResolvedValueOnce({ error: null })
+    await act(async () => {
+      await result.current.updateOrderStatus('o1', 'shipped', 'TRACK-123')
+    })
+
+    expect(mockChain.update).toHaveBeenCalledWith(
+      expect.objectContaining({ tracking_number: 'TRACK-123' }),
+    )
+  })
+
+  it('updateOrderStatus retorna null si ok', async () => {
+    const { result } = renderHook(() => useAdminOrders())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    mockChain.eq.mockResolvedValueOnce({ error: null })
+    let returnValue: string | null = 'initial'
+    await act(async () => {
+      returnValue = await result.current.updateOrderStatus('o1', 'paid')
+    })
+
+    expect(returnValue).toBeNull()
+  })
+
+  it('updateOrderStatus retorna mensaje de error si falla', async () => {
+    const { result } = renderHook(() => useAdminOrders())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    mockChain.eq.mockResolvedValueOnce({ error: { message: 'update failed' } })
+    let returnValue: string | null = null
+    await act(async () => {
+      returnValue = await result.current.updateOrderStatus('o1', 'paid')
+    })
+
+    expect(returnValue).toBe('update failed')
   })
 })

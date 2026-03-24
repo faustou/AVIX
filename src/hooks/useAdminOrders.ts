@@ -9,6 +9,8 @@ function mapOrder(o: any): OrderWithItems {
     status: o.status as OrderStatus,
     total: o.total ?? 0,
     created_at: o.created_at ?? '',
+    tracking_number: o.tracking_number ?? null,
+    shipped_at: o.shipped_at ?? null,
     items: ((o.order_items ?? []) as any[]).map((item) => ({
       id: item.id,
       product_id: item.product_id,
@@ -27,6 +29,7 @@ export function useAdminOrders(): {
   filterStatus: OrderStatus | 'all'
   setFilterStatus: (status: OrderStatus | 'all') => void
   refetch: () => Promise<void>
+  updateOrderStatus: (id: string, status: OrderStatus, trackingNumber?: string) => Promise<string | null>
 } {
   const [orders, setOrders] = useState<OrderWithItems[]>([])
   const [loading, setLoading] = useState(true)
@@ -76,5 +79,20 @@ export function useAdminOrders(): {
     setTick((t) => t + 1)
   }, [])
 
-  return { orders, loading, error, filterStatus, setFilterStatus, refetch }
+  const updateOrderStatus = useCallback(
+    async (id: string, status: OrderStatus, trackingNumber?: string): Promise<string | null> => {
+      const updates: Record<string, unknown> = { status }
+      if (status === 'shipped') {
+        updates.shipped_at = new Date().toISOString()
+        if (trackingNumber) updates.tracking_number = trackingNumber
+      }
+      const { error } = await supabase.from('orders').update(updates).eq('id', id)
+      if (error) return error.message
+      setTick((t) => t + 1)
+      return null
+    },
+    [],
+  )
+
+  return { orders, loading, error, filterStatus, setFilterStatus, refetch, updateOrderStatus }
 }

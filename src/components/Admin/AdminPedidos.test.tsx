@@ -8,6 +8,7 @@ const mockUseAdminOrders = vi.hoisted(() => vi.fn())
 vi.mock('@/hooks/useAdminOrders', () => ({ useAdminOrders: mockUseAdminOrders }))
 
 const mockSetFilterStatus = vi.fn()
+const mockUpdateOrderStatus = vi.fn()
 
 const orders = [
   {
@@ -16,6 +17,8 @@ const orders = [
     status: 'paid' as const,
     total: 150,
     created_at: '2024-06-15T10:30:00Z',
+    tracking_number: null,
+    shipped_at: null,
     items: [
       { id: 'oi1', product_id: 'p1', product_code: 'YS-01', size: '8', quantity: 2, unit_price: 75 },
     ],
@@ -26,6 +29,8 @@ const orders = [
     status: 'pending' as const,
     total: 40,
     created_at: '2024-06-16T14:00:00Z',
+    tracking_number: null,
+    shipped_at: null,
     items: [],
   },
   {
@@ -34,12 +39,15 @@ const orders = [
     status: 'failed' as const,
     total: 80,
     created_at: '2024-06-17T09:00:00Z',
+    tracking_number: null,
+    shipped_at: null,
     items: [],
   },
 ]
 
 beforeEach(() => {
   mockSetFilterStatus.mockReset()
+  mockUpdateOrderStatus.mockReset().mockResolvedValue(null)
   mockUseAdminOrders.mockReturnValue({
     orders,
     loading: false,
@@ -47,6 +55,7 @@ beforeEach(() => {
     filterStatus: 'all',
     setFilterStatus: mockSetFilterStatus,
     refetch: vi.fn(),
+    updateOrderStatus: mockUpdateOrderStatus,
   })
 })
 
@@ -146,5 +155,62 @@ describe('AdminPedidos', () => {
     const user = userEvent.setup()
     await user.click(screen.getByTestId('filter-paid'))
     expect(mockSetFilterStatus).toHaveBeenCalledWith('paid')
+  })
+
+  it('filtro incluye ENVIADOS', () => {
+    renderPedidos()
+    expect(screen.getByTestId('filter-shipped')).toBeInTheDocument()
+    expect(screen.getByTestId('filter-shipped')).toHaveTextContent('ENVIADOS')
+  })
+
+  it('badge "shipped" muestra ENVIADO', () => {
+    mockUseAdminOrders.mockReturnValueOnce({
+      orders: [{ ...orders[0], id: 'o4', status: 'shipped', tracking_number: 'TRACK-1', shipped_at: '2024-06-18T12:00:00Z' }],
+      loading: false,
+      error: null,
+      filterStatus: 'all',
+      setFilterStatus: mockSetFilterStatus,
+      refetch: vi.fn(),
+      updateOrderStatus: mockUpdateOrderStatus,
+    })
+    renderPedidos()
+    expect(screen.getByTestId('order-status-o4')).toHaveTextContent('ENVIADO')
+  })
+
+  it('botón VER expande el detalle del pedido', async () => {
+    renderPedidos()
+    expect(screen.queryByTestId('detail-o1')).not.toBeInTheDocument()
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('view-btn-o1'))
+    expect(screen.getByTestId('detail-o1')).toBeInTheDocument()
+  })
+
+  it('detalle muestra los items del pedido', async () => {
+    renderPedidos()
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('view-btn-o1'))
+    expect(screen.getByText('YS-01')).toBeInTheDocument()
+  })
+
+  it('para status="paid" muestra botón MARCAR COMO ENVIADO', async () => {
+    renderPedidos()
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('view-btn-o1'))
+    expect(screen.getByTestId('mark-shipped-o1')).toBeInTheDocument()
+  })
+
+  it('para status="pending" muestra botón MARCAR COMO PAGADO', async () => {
+    renderPedidos()
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('view-btn-o2'))
+    expect(screen.getByTestId('mark-paid-o2')).toBeInTheDocument()
+  })
+
+  it('al tocar MARCAR COMO ENVIADO llama a updateOrderStatus', async () => {
+    renderPedidos()
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('view-btn-o1'))
+    await user.click(screen.getByTestId('mark-shipped-o1'))
+    expect(mockUpdateOrderStatus).toHaveBeenCalledWith('o1', 'shipped', undefined)
   })
 })

@@ -65,7 +65,7 @@ export interface Order {
   created_at: string
 }
 
-export type OrderStatus = 'pending' | 'paid' | 'failed'
+export type OrderStatus = 'pending' | 'paid' | 'failed' | 'shipped'
 
 export interface OrderItem {
   id: string
@@ -82,5 +82,7 @@ export interface OrderWithItems {
   status: OrderStatus
   total: number
   created_at: string
+  tracking_number: string | null
+  shipped_at: string | null
   items: OrderItem[]
 }
