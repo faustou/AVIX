@@ -16,6 +16,10 @@ export function useCheckout(): {
     setError(null)
 
     try {
+      // DEBUG TEMPORAL — remover antes de producción final
+      console.log('SUPABASE URL:', import.meta.env.VITE_SUPABASE_URL)
+      console.log('ANON KEY (primeros 20 chars):', import.meta.env.VITE_SUPABASE_ANON_KEY?.substring(0, 20))
+
       // 1. Crear orden
       const { data: order, error: orderErr } = await supabase
         .from('orders')
