@@ -124,7 +124,11 @@ describe('useAdminProducts', () => {
 
   it('uploadImage sube archivo y retorna path', async () => {
     const uploadMock = vi.fn().mockResolvedValue({ data: { path: 'uploaded.jpg' }, error: null })
-    mockStorage.from.mockReturnValueOnce({ upload: uploadMock, remove: vi.fn() })
+    mockStorage.from.mockReturnValueOnce({
+      upload: uploadMock,
+      remove: vi.fn(),
+      getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://example.com/img.jpg' } }),
+    })
 
     const { result } = renderHook(() => useAdminProducts())
     await waitFor(() => expect(result.current.loading).toBe(false))

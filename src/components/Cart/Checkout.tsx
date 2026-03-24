@@ -20,10 +20,7 @@ export function Checkout() {
   if (preferenceId) {
     return (
       <div className={styles.brickContainer} data-testid="mp-brick">
-        <Wallet
-          initialization={{ preferenceId }}
-          customization={{ texts: { valueProp: 'smart_option' } }}
-        />
+        <Wallet initialization={{ preferenceId }} />
       </div>
     )
   }
