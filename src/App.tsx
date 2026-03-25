@@ -12,11 +12,16 @@ import type { Category } from '@/types'
 function AppContent() {
   const { cartCount, addItem } = useCart()
   const { columns, cycle, direction } = useColumnCycle()
+  const [desktopColumns, setDesktopColumns] = useState<6 | 3>(6)
   const [activeCategory, setActiveCategory] = useState<Category>('new')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [showCart, setShowCart] = useState(false)
 
   const { products, loading, error } = useProducts(activeCategory)
+
+  function toggleDesktopColumns() {
+    setDesktopColumns((c) => (c === 6 ? 3 : 6))
+  }
 
   return (
     <div className={styles.app} data-testid="app">
@@ -30,6 +35,8 @@ function AppContent() {
         dataOverlay={selectedIndex !== null}
         onCycle={cycle}
         columnDirection={direction}
+        desktopColumns={desktopColumns}
+        onDesktopToggle={toggleDesktopColumns}
       />
 
       {loading ? (
@@ -43,6 +50,7 @@ function AppContent() {
           products={products}
           onProductSelect={(index) => setSelectedIndex(index)}
           columns={columns}
+          desktopColumns={desktopColumns}
         />
       ) : (
         <ProductFeed

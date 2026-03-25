@@ -35,7 +35,7 @@ export function Cart({ onClose }: CartProps) {
       </div>
 
       {/* Page title */}
-      <div className={styles.orderTitle}>ORDER SUMMARY</div>
+      <div className={styles.orderTitle}>RESUMEN DEL PEDIDO</div>
 
       {/* Items */}
       <div className={styles.items}>
@@ -66,13 +66,13 @@ export function Cart({ onClose }: CartProps) {
                   </span>
                 </div>
                 <div className={styles.itemRow}>
-                  <span className={styles.metaLabel}>SIZE</span>
+                  <span className={styles.metaLabel}>TALLE</span>
                   <span className={styles.metaValue} data-testid="item-size">
                     {item.size}
                   </span>
                 </div>
                 <div className={styles.itemRow}>
-                  <span className={styles.metaLabel}>QTY</span>
+                  <span className={styles.metaLabel}>CANT.</span>
                   <div className={styles.qtyControls}>
                     <button
                       className={styles.qtyButton}
@@ -112,30 +112,16 @@ export function Cart({ onClose }: CartProps) {
           <span data-testid="subtotal">${subtotal.toFixed(2)}</span>
         </div>
         <div className={styles.totalRow}>
-          <span>SHIPPING</span>
-          <span className={styles.muted}>CALCULATED AT NEXT STEP</span>
+          <span>ENVÍO</span>
+          <span className={styles.muted}>SE CALCULA EN EL SIGUIENTE PASO</span>
         </div>
         <div className={styles.totalRow}>
-          <span>TAXES</span>
+          <span>IMPUESTOS</span>
           <span>$0.00</span>
         </div>
         <div className={`${styles.totalRow} ${styles.totalFinal}`}>
           <span>TOTAL</span>
           <span data-testid="total">${total.toFixed(2)}</span>
-        </div>
-      </div>
-
-      {/* Express checkout */}
-      <div className={styles.express}>
-        <div className={styles.expressTitle}>EXPRESS CHECKOUT</div>
-        <button className={styles.expressButton} data-testid="apple-pay">
-          APPLE PAY
-        </button>
-        <button className={styles.expressButton} data-testid="paypal">
-          PAYPAL
-        </button>
-        <div className={styles.divider}>
-          <span>OR CONTINUE BELOW</span>
         </div>
       </div>
 

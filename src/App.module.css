@@ -24,3 +24,10 @@
   display: flex;
   flex-direction: column;
 }
+
+@media (min-width: 1024px) {
+  .app {
+    max-width: 100%;
+    margin: 0;
+  }
+}

@@ -63,3 +63,13 @@
   padding: 16px;
   padding-bottom: 40px;
 }
+
+.secureText {
+  font-family: var(--font-main);
+  font-size: 0.6rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-muted);
+  text-align: center;
+  margin-top: 8px;
+}

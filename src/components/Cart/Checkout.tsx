@@ -21,6 +21,7 @@ export function Checkout() {
     return (
       <div className={styles.brickContainer} data-testid="mp-brick">
         <Wallet initialization={{ preferenceId }} />
+        <div className={styles.secureText}>PAGA DE FORMA SEGURA</div>
       </div>
     )
   }
@@ -29,7 +30,7 @@ export function Checkout() {
     <form className={styles.form} onSubmit={handleSubmit} data-testid="checkout-form">
       <div className={styles.fieldGroup}>
         <label className={styles.label} htmlFor="checkout-email">
-          EMAIL ADDRESS
+          EMAIL
         </label>
         <input
           id="checkout-email"

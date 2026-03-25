@@ -12,6 +12,8 @@ interface NavProps {
   dataOverlay?: boolean
   onCycle?: () => void
   columnDirection?: 'in' | 'out'
+  desktopColumns?: 6 | 3
+  onDesktopToggle?: () => void
 }
 
 const ROW_1: Category[] = ['new', 'mens', 'womens']
@@ -27,6 +29,8 @@ export function Nav({
   dataOverlay,
   onCycle,
   columnDirection,
+  desktopColumns,
+  onDesktopToggle,
 }: NavProps) {
   return (
     <nav
@@ -45,14 +49,26 @@ export function Nav({
             <CycleIcon direction="out" />
           </button>
         ) : (
-          <button
-            className={styles.cycleButton}
-            onClick={onCycle}
-            aria-label="Change columns"
-            data-testid="cycle-button"
-          >
-            <CycleIcon direction={columnDirection ?? 'in'} />
-          </button>
+          <>
+            {/* Mobile: ciclo de columnas */}
+            <button
+              className={`${styles.cycleButton} ${styles.mobileOnly}`}
+              onClick={onCycle}
+              aria-label="Change columns"
+              data-testid="cycle-button"
+            >
+              <CycleIcon direction={columnDirection ?? 'in'} />
+            </button>
+            {/* Desktop: toggle 6/3 columnas */}
+            <button
+              className={`${styles.cycleButton} ${styles.desktopOnly}`}
+              onClick={onDesktopToggle}
+              aria-label="Toggle columns"
+              data-testid="desktop-toggle-button"
+            >
+              {desktopColumns === 6 ? '−' : '+'}
+            </button>
+          </>
         )}
       </div>
 

@@ -90,6 +90,33 @@
   color: var(--color-text);
 }
 
+/* ── Responsive helpers ── */
+
+.mobileOnly {
+  display: flex;
+}
+
+.desktopOnly {
+  display: none;
+  font-family: var(--font-main);
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+@media (min-width: 1024px) {
+  .mobileOnly {
+    display: none;
+  }
+
+  .desktopOnly {
+    display: flex;
+    align-items: center;
+  }
+}
+
 /* ── Cart count badge ── */
 
 .cartCount {

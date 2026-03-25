@@ -5,16 +5,18 @@ interface ProductGridProps {
   products: Product[]
   onProductSelect: (index: number) => void
   columns: number
+  desktopColumns?: 6 | 3
 }
 
 const FOOTER_LINKS = ['CONTACT', 'TERMS', 'PRIVACY', 'ACCESSIBILITY', 'DNSMPI', 'COOKIES']
 
-export function ProductGrid({ products, onProductSelect, columns }: ProductGridProps) {
+export function ProductGrid({ products, onProductSelect, columns, desktopColumns = 6 }: ProductGridProps) {
   return (
     <div className={styles.wrapper}>
       <div
         className={styles.grid}
         data-columns={columns}
+        data-columns-desktop={desktopColumns}
         data-testid="product-grid"
       >
         {products.map((product, i) => {

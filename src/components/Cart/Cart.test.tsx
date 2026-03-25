@@ -43,7 +43,7 @@ function renderCart(onClose = vi.fn()) {
 describe('Cart', () => {
   it('renderiza ORDER SUMMARY', () => {
     renderCart()
-    expect(screen.getByText('ORDER SUMMARY')).toBeInTheDocument()
+    expect(screen.getByText('RESUMEN DEL PEDIDO')).toBeInTheDocument()
   })
 
   it('muestra todos los items del carrito', () => {
@@ -93,10 +93,9 @@ describe('Cart', () => {
     expect(screen.queryByTestId('cart-item')).not.toBeInTheDocument()
   })
 
-  it('renderiza botones Apple Pay y PayPal', () => {
+  it('renderiza el formulario de checkout', () => {
     renderCart()
-    expect(screen.getByTestId('apple-pay')).toBeInTheDocument()
-    expect(screen.getByTestId('paypal')).toBeInTheDocument()
+    expect(screen.getByTestId('checkout-form')).toBeInTheDocument()
   })
 
   it('renderiza el input de email', () => {
