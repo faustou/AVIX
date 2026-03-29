@@ -1,13 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Nav } from './Nav'
-import type { Category } from '@/types'
-
-const CATEGORIES: Category[] = ['new', 'mens', 'womens', 'slides', 'accessories']
 
 const BASE_PROPS = {
-  activeCategory: 'new' as Category,
-  onCategoryChange: vi.fn(),
   cartCount: 0,
   onCartClick: vi.fn(),
   showBack: false,
@@ -21,29 +16,6 @@ function renderNav(overrides: Partial<Parameters<typeof Nav>[0]> = {}) {
 }
 
 describe('Nav', () => {
-  it('renderiza las 5 categorías', () => {
-    renderNav()
-    for (const cat of CATEGORIES) {
-      expect(screen.getByTestId(`category-${cat}`)).toBeInTheDocument()
-    }
-  })
-
-  it('la categoría activa tiene data-active="true" y las demás "false"', () => {
-    renderNav({ activeCategory: 'slides' })
-    expect(screen.getByTestId('category-slides')).toHaveAttribute('data-active', 'true')
-    for (const cat of CATEGORIES.filter((c) => c !== 'slides')) {
-      expect(screen.getByTestId(`category-${cat}`)).toHaveAttribute('data-active', 'false')
-    }
-  })
-
-  it('al tocar una categoría llama onCategoryChange con el slug correcto', async () => {
-    const { onCategoryChange } = renderNav({ activeCategory: 'new' })
-    const user = userEvent.setup()
-    await user.click(screen.getByTestId('category-womens'))
-    expect(onCategoryChange).toHaveBeenCalledOnce()
-    expect(onCategoryChange).toHaveBeenCalledWith('womens')
-  })
-
   it('si cartCount > 0 muestra el número junto al carrito', () => {
     renderNav({ cartCount: 3 })
     expect(screen.getByTestId('cart-count')).toHaveTextContent('3')

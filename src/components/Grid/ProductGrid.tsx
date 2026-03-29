@@ -7,7 +7,6 @@ interface ProductGridProps {
   columns: number
 }
 
-const FOOTER_LINKS = ['CONTACT', 'TERMS', 'PRIVACY', 'ACCESSIBILITY', 'DNSMPI', 'COOKIES']
 
 export function ProductGrid({ products, onProductSelect, columns }: ProductGridProps) {
   return (
