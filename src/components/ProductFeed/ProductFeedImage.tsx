@@ -9,8 +9,8 @@ interface Props {
   images: ProductImage[]
   animationState: AnimationState
   onAnimationEnd: () => void
-  onSwipeNext: () => void
-  onSwipePrev: () => void
+  onSwipeNext?: () => void
+  onSwipePrev?: () => void
 }
 
 export function ProductFeedImage({ images, animationState, onAnimationEnd, onSwipeNext, onSwipePrev }: Props) {
@@ -66,8 +66,8 @@ export function ProductFeedImage({ images, animationState, onAnimationEnd, onSwi
     touchStartY.current = null
     touchStartX.current = null
     if (deltaX > Math.abs(deltaY) || Math.abs(deltaY) < 50) return
-    if (deltaY > 0) onSwipeNext()
-    else onSwipePrev()
+    if (deltaY > 0) onSwipeNext?.()
+    else onSwipePrev?.()
   }
 
   function handleMouseDown(e: MouseEvent) {
@@ -79,8 +79,8 @@ export function ProductFeedImage({ images, animationState, onAnimationEnd, onSwi
     const deltaY = mouseStartY.current - e.clientY
     mouseStartY.current = null
     if (Math.abs(deltaY) < 50) return
-    if (deltaY > 0) onSwipeNext()
-    else onSwipePrev()
+    if (deltaY > 0) onSwipeNext?.()
+    else onSwipePrev?.()
   }
 
   const wheelBlocked = useRef(false)
