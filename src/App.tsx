@@ -111,6 +111,10 @@ function AppContent() {
           initialIndex={selectedIndex}
           onAddToCart={addItem}
           onClose={handleClose}
+          onProductChange={(index) => {
+            const code = products[index]?.code
+            if (code) window.history.replaceState({}, '', `/?producto=${encodeURIComponent(code)}`)
+          }}
         />
       )}
 

@@ -12,23 +12,28 @@ interface Props {
   initialIndex: number
   onAddToCart: (product: Product, size: string) => void
   onClose: () => void
+  onProductChange?: (index: number) => void
 }
 
-export function ProductFeed({ products, initialIndex, onAddToCart }: Props) {
+export function ProductFeed({ products, initialIndex, onAddToCart, onProductChange }: Props) {
   const [activeIndex, setActiveIndex] = useState(initialIndex)
   const [displayIndex, setDisplayIndex] = useState(initialIndex)
   const [animationState, setAnimationState] = useState<AnimationState>('idle')
 
   function goNext() {
     if (activeIndex >= products.length - 1) return
-    setActiveIndex((i) => i + 1)
+    const next = activeIndex + 1
+    setActiveIndex(next)
     setAnimationState('exit-up')
+    onProductChange?.(next)
   }
 
   function goPrev() {
     if (activeIndex <= 0) return
-    setActiveIndex((i) => i - 1)
+    const next = activeIndex - 1
+    setActiveIndex(next)
     setAnimationState('exit-down')
+    onProductChange?.(next)
   }
 
   function handleAnimationEnd() {
