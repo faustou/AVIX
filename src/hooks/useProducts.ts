@@ -46,7 +46,7 @@ export function useProducts(category: Category): {
         code: p.code,
         category_slug: (p.category_slug ?? 'new') as Category,
         price: p.price,
-        discount_price: p.discount_price ?? null,
+        discount_price: (p as any).discount_price ?? null,
         information: p.information ?? null,
         size_system: (p.size_system ?? 'letter') as Product['size_system'],
         created_at: p.created_at ?? '',

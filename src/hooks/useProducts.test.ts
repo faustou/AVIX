@@ -64,11 +64,11 @@ describe('useProducts', () => {
   })
 
   it('para otras categorías filtra por category_slug', async () => {
-    const { result } = renderHook(() => useProducts('mens'))
+    const { result } = renderHook(() => useProducts('remeras'))
     await waitFor(() => expect(result.current.loading).toBe(false))
     const slugCall = mockChain.eq.mock.calls.find((c) => c[0] === 'category_slug')
     expect(slugCall).toBeDefined()
-    expect(slugCall![1]).toBe('mens')
+    expect(slugCall![1]).toBe('remeras')
   })
 
   it('si Supabase retorna error, error !== null', async () => {

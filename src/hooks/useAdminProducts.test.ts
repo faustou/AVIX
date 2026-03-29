@@ -42,7 +42,7 @@ const mockProducts = [
   {
     id: 'p1',
     code: 'ABC-001',
-    category_slug: 'mens',
+    category_slug: 'remeras',
     price: 100,
     information: null,
     size_system: 'letter',
@@ -98,7 +98,7 @@ describe('useAdminProducts', () => {
     await act(async () => {
       returnValue = await result.current.createProduct({
         code: 'NEW-001',
-        category_slug: 'mens',
+        category_slug: 'remeras',
         price: 50,
         information: '',
         size_system: 'letter',

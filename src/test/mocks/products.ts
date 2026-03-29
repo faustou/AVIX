@@ -6,6 +6,7 @@ export const mockProducts: Product[] = [
     code: 'YS-01',
     category_slug: 'new',
     price: 40,
+    discount_price: null,
     information: null,
     size_system: 'us_eu',
     created_at: '2024-01-01T00:00:00Z',
@@ -15,14 +16,12 @@ export const mockProducts: Product[] = [
         product_id: '1',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=YS-01',
         position: 0,
-
       },
       {
         id: 'img-1-b',
         product_id: '1',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=YS-01-B',
         position: 1,
-
       },
     ],
     product_sizes: [
@@ -34,8 +33,9 @@ export const mockProducts: Product[] = [
   {
     id: '2',
     code: 'PK-01',
-    category_slug: 'mens',
+    category_slug: 'remeras',
     price: 85,
+    discount_price: null,
     information: 'Handcrafted from full-grain leather. Water-resistant treatment. Sole: natural rubber.',
     size_system: 'us_eu',
     created_at: '2024-01-02T00:00:00Z',
@@ -45,21 +45,18 @@ export const mockProducts: Product[] = [
         product_id: '2',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=PK-01',
         position: 0,
-
       },
       {
         id: 'img-2-b',
         product_id: '2',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=PK-01-B',
         position: 1,
-
       },
       {
         id: 'img-2-c',
         product_id: '2',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=PK-01-C',
         position: 2,
-
       },
     ],
     product_sizes: [
@@ -71,8 +68,9 @@ export const mockProducts: Product[] = [
   {
     id: '3',
     code: 'AC-01',
-    category_slug: 'accessories',
+    category_slug: 'gollerias',
     price: 25,
+    discount_price: null,
     information: null,
     size_system: 'letter',
     created_at: '2024-01-03T00:00:00Z',
@@ -82,14 +80,12 @@ export const mockProducts: Product[] = [
         product_id: '3',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=AC-01',
         position: 0,
-
       },
       {
         id: 'img-3-b',
         product_id: '3',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=AC-01-B',
         position: 1,
-
       },
     ],
     product_sizes: [
@@ -99,8 +95,9 @@ export const mockProducts: Product[] = [
   {
     id: '4',
     code: 'SL-01',
-    category_slug: 'slides',
+    category_slug: 'camperas',
     price: 55,
+    discount_price: null,
     information: null,
     size_system: 'us_eu',
     created_at: '2024-01-04T00:00:00Z',
@@ -110,7 +107,6 @@ export const mockProducts: Product[] = [
         product_id: '4',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=SL-01',
         position: 0,
-
       },
     ],
     product_sizes: [
@@ -121,8 +117,9 @@ export const mockProducts: Product[] = [
   {
     id: '5',
     code: 'WM-01',
-    category_slug: 'womens',
+    category_slug: 'musculosas',
     price: 70,
+    discount_price: null,
     information: null,
     size_system: 'us_eu',
     created_at: '2024-01-05T00:00:00Z',
@@ -132,14 +129,12 @@ export const mockProducts: Product[] = [
         product_id: '5',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=WM-01',
         position: 0,
-
       },
       {
         id: 'img-5-b',
         product_id: '5',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=WM-01-B',
         position: 1,
-
       },
     ],
     product_sizes: [
@@ -150,8 +145,9 @@ export const mockProducts: Product[] = [
   {
     id: '6',
     code: 'AC-02',
-    category_slug: 'accessories',
+    category_slug: 'gollerias',
     price: 18,
+    discount_price: null,
     information: 'Adjustable strap. One size fits all.',
     size_system: 'letter',
     created_at: '2024-01-06T00:00:00Z',
@@ -161,7 +157,6 @@ export const mockProducts: Product[] = [
         product_id: '6',
         storage_path: 'https://placehold.co/400x400/ffffff/000000?text=AC-02',
         position: 0,
-
       },
     ],
     product_sizes: [
