@@ -100,6 +100,7 @@ describe('useAdminProducts', () => {
         code: 'NEW-001',
         category_slug: 'remeras',
         price: 50,
+        discount_price: null,
         information: '',
         size_system: 'letter',
         published: false,
