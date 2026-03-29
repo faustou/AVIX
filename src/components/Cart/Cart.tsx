@@ -144,13 +144,6 @@ export function Cart({ onClose }: CartProps) {
           {/* Checkout form (mobile: below shipping) */}
           <div className={styles.checkoutMobile}>
             <Checkout />
-            <div className={styles.safeBadge}>
-              <img src="/safe-shopping.svg" alt="" className={styles.safeBadgeIcon} />
-              <div className={styles.safeBadgeText}>
-                <span className={styles.safeBadgeLine1}>COMPRA SEGURA</span>
-                <span className={styles.safeBadgeLine2}>100% PROTEGIDO</span>
-              </div>
-            </div>
           </div>
         </div>
 

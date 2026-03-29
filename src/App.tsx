@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import styles from './App.module.css'
 import { CartProvider, useCart } from '@/hooks/useCart'
 
@@ -25,14 +25,53 @@ function AppContent() {
 
   const { products, loading, error } = useProducts(activeCategory)
 
+  // ── URL sync ──
+  const didRestoreFromUrl = useRef(false)
+
+  // Al cargar los productos, abrir el que viene en la URL (una sola vez)
+  useEffect(() => {
+    if (loading || didRestoreFromUrl.current) return
+    const code = new URLSearchParams(window.location.search).get('producto')
+    if (!code) return
+    const index = products.findIndex((p) => p.code === code)
+    if (index !== -1) setSelectedIndex(index)
+    didRestoreFromUrl.current = true
+  }, [products, loading])
+
+  // Escuchar el botón "atrás" del browser
+  useEffect(() => {
+    function handlePopState() {
+      const code = new URLSearchParams(window.location.search).get('producto')
+      if (!code) {
+        setSelectedIndex(null)
+      } else {
+        const index = products.findIndex((p) => p.code === code)
+        if (index !== -1) setSelectedIndex(index)
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [products])
+
+  function handleProductSelect(index: number) {
+    const code = products[index]?.code
+    if (code) window.history.pushState({}, '', `/?producto=${encodeURIComponent(code)}`)
+    setSelectedIndex(index)
+  }
+
+  function handleClose() {
+    window.history.pushState({}, '', '/')
+    setSelectedIndex(null)
+  }
+
   return (
     <div className={styles.app} data-feed={selectedIndex !== null ? 'true' : 'false'} data-testid="app">
       <Nav
         cartCount={cartCount}
         onCartClick={() => setShowCart(true)}
         showBack={selectedIndex !== null}
-        onBackClick={() => setSelectedIndex(null)}
-        onLogoClick={() => { setSelectedIndex(null); setActiveCategoryBar(null); setActiveCategory('new') }}
+        onBackClick={handleClose}
+        onLogoClick={() => { handleClose(); setActiveCategoryBar(null); setActiveCategory('new') }}
         dataOverlay={selectedIndex !== null}
         onCycle={cycle}
         columnDirection={direction}
@@ -63,7 +102,7 @@ function AppContent() {
       ) : selectedIndex === null ? (
         <ProductGrid
           products={products}
-          onProductSelect={(index) => setSelectedIndex(index)}
+          onProductSelect={handleProductSelect}
           columns={columns}
         />
       ) : (
@@ -71,7 +110,7 @@ function AppContent() {
           products={products}
           initialIndex={selectedIndex}
           onAddToCart={addItem}
-          onClose={() => setSelectedIndex(null)}
+          onClose={handleClose}
         />
       )}
 
