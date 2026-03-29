@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import type { WheelEvent } from 'react'
 import styles from './ProductFeed.module.css'
 import { ProductFeedImage } from './ProductFeedImage'
 import { ProductFeedInfo } from './ProductFeedInfo'
-import { useSwipe } from '@/hooks/useSwipe'
 import type { Product } from '@/types'
 
 type AnimationState = 'idle' | 'exit-up' | 'exit-down' | 'enter-up' | 'enter-down'
@@ -43,18 +43,29 @@ export function ProductFeed({ products, initialIndex, onAddToCart }: Props) {
     }
   }
 
-  const swipeHandlers = useSwipe(goNext, goPrev)
+  const wheelBlocked = useRef(false)
+
+  function handleWheel(e: WheelEvent) {
+    if (Math.abs(e.deltaY) < 30) return
+    if (wheelBlocked.current) return
+    wheelBlocked.current = true
+    setTimeout(() => { wheelBlocked.current = false }, 700)
+    if (e.deltaY > 0) goNext()
+    else goPrev()
+  }
 
   return (
     <div
       className={styles.container}
       data-testid="product-feed"
-      {...swipeHandlers}
+      onWheel={handleWheel}
     >
       <ProductFeedImage
         images={products[displayIndex].product_images}
         animationState={animationState}
         onAnimationEnd={handleAnimationEnd}
+        onSwipeNext={goNext}
+        onSwipePrev={goPrev}
       />
       <ProductFeedInfo
         product={products[displayIndex]}

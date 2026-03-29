@@ -64,28 +64,91 @@
   letter-spacing: var(--letter-spacing);
   text-transform: uppercase;
   color: var(--color-text);
-  padding: 8px 16px 20px;
+  padding: 8px 16px 16px;
 }
 
-/* ── Items ── */
+/* ── Body (two-column on desktop) ── */
 
-.items {
-  padding: 0 16px;
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 16px 40px;
+  gap: 0;
+}
+
+@media (min-width: 768px) {
+  .body {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 0 40px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* ── Left column ── */
+
+.left {
   display: flex;
   flex-direction: column;
   gap: 24px;
   flex: 1;
 }
 
+@media (min-width: 768px) {
+  .left {
+    flex: 7;
+  }
+}
+
+/* ── Right column ── */
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 24px;
+  border-top: 1px solid #333;
+  padding-top: 24px;
+}
+
+@media (min-width: 768px) {
+  .right {
+    flex: 3;
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+    position: sticky;
+    top: 60px;
+    border-left: 1px solid #222;
+    padding-left: 32px;
+  }
+}
+
+/* ── Items ── */
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .item {
   display: flex;
   gap: 12px;
   align-items: flex-start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #1a1a1a;
 }
 
 .thumbnail {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
   flex-shrink: 0;
   background-color: var(--color-bg);
@@ -94,7 +157,7 @@
 .itemInfo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   flex: 1;
 }
 
@@ -112,6 +175,10 @@
   color: var(--color-text);
 }
 
+.itemSize {
+  color: var(--color-muted);
+}
+
 .itemPrice {
   font-family: var(--font-main);
   font-size: 0.75rem;
@@ -119,24 +186,27 @@
   color: var(--color-text);
 }
 
-.metaLabel {
-  font-family: var(--font-main);
-  font-size: 0.65rem;
-  letter-spacing: var(--letter-spacing);
+.removeButton {
+  background: none;
+  border: none;
   color: var(--color-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
 }
 
-.metaValue {
-  font-family: var(--font-main);
-  font-size: 0.65rem;
-  letter-spacing: var(--letter-spacing);
+.removeButton:hover {
   color: var(--color-text);
 }
 
 .qtyControls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  border: 1px solid #333;
+  padding: 4px 10px;
+  width: fit-content;
 }
 
 .qtyButton {
@@ -159,15 +229,135 @@
   text-align: center;
 }
 
-/* ── Totals ── */
+/* ── Shipping options ── */
 
-.totals {
-  padding: 24px 16px 16px;
-  border-top: 1px solid #eeeeee;
+.shippingSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shippingSectionTitle {
+  font-family: var(--font-main);
+  font-size: 0.6rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding: 8px 0 6px;
+  border-top: 1px solid #222;
+}
+
+.shippingOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #1a1a1a;
+  cursor: pointer;
+}
+
+.shippingRadio {
+  accent-color: var(--color-text);
+  flex-shrink: 0;
+}
+
+.shippingOptionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.shippingOptionName {
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.shippingOptionSub {
+  font-family: var(--font-main);
+  font-size: 0.58rem;
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-muted);
+  text-transform: uppercase;
+}
+
+.shippingOptionPrice {
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-text);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Checkout visibility toggle ── */
+
+.checkoutMobile {
+  display: block;
+}
+
+.checkoutDesktop {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .checkoutMobile {
+    display: none;
+  }
+  .checkoutDesktop {
+    display: block;
+    margin-top: 20px;
+  }
+}
+
+/* ── Barra envío gratis ── */
+
+.shippingBar {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 24px;
+  padding-bottom: 20px;
+}
+
+.shippingBarTrack {
+  width: 100%;
+  height: 2px;
+  background: #333;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.shippingBarFill {
+  height: 100%;
+  background: #22c55e;
+  border-radius: 1px;
+  transition: width 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shippingBarText {
+  font-family: var(--font-main);
+  font-size: 0.62rem;
+  letter-spacing: var(--letter-spacing);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.shippingBarHighlight {
+  color: #22c55e;
+}
+
+/* ── Totals ── */
+
+.totals {
+  padding: 16px 0;
+  border-top: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .totalRow {
@@ -181,18 +371,65 @@
 }
 
 .totalFinal {
-  margin-top: 4px;
-  font-size: 0.8rem;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  padding-top: 12px;
+  border-top: 1px solid #333;
 }
 
 .muted {
   color: var(--color-muted);
 }
 
-/* ── Express checkout ── */
+/* ── Safe badge ── */
+
+.safeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 7px 12px;
+  margin: 20px auto 0;
+  align-self: center;
+}
+
+.safeBadgeIcon {
+  height: 28px;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.safeBadgeText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.safeBadgeLine1 {
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.safeBadgeLine2 {
+  font-family: var(--font-main);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: #7cc45a;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* ── Express checkout / Form (Checkout.tsx uses Checkout.module.css) ── */
 
 .express {
-  padding: 16px;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -233,14 +470,11 @@
   justify-content: center;
 }
 
-/* ── Form ── */
-
 .form {
-  padding: 16px;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-bottom: 40px;
 }
 
 .fieldGroup {

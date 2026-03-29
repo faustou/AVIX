@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { WheelEvent } from 'react'
+import type { WheelEvent, TouchEvent, MouseEvent } from 'react'
 import styles from './ProductFeedImage.module.css'
 import type { ProductImage } from '@/types'
 
@@ -9,10 +9,21 @@ interface Props {
   images: ProductImage[]
   animationState: AnimationState
   onAnimationEnd: () => void
+  onSwipeNext: () => void
+  onSwipePrev: () => void
 }
 
-export function ProductFeedImage({ images, animationState, onAnimationEnd }: Props) {
+export function ProductFeedImage({ images, animationState, onAnimationEnd, onSwipeNext, onSwipePrev }: Props) {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [showHint, setShowHint] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setShowHint(false)
+      sessionStorage.setItem('avix-swipe-hint', '1')
+    }, 3500)
+    return () => clearTimeout(t)
+  }, [])
   const carouselRef = useRef<HTMLDivElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -36,6 +47,40 @@ export function ProductFeedImage({ images, animationState, onAnimationEnd }: Pro
     const imageWidth = getImageWidth(el)
     const index = Math.round(el.scrollLeft / imageWidth)
     setActiveImageIndex(index)
+  }
+
+  // ── Touch/mouse handlers para swipe de PRODUCTO (solo en imagen) ──
+  const touchStartY = useRef<number | null>(null)
+  const touchStartX = useRef<number | null>(null)
+  const mouseStartY = useRef<number | null>(null)
+
+  function handleTouchStart(e: TouchEvent) {
+    touchStartY.current = e.touches[0].clientY
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  function handleTouchEnd(e: TouchEvent) {
+    if (touchStartY.current === null || touchStartX.current === null) return
+    const deltaY = touchStartY.current - e.changedTouches[0].clientY
+    const deltaX = Math.abs(touchStartX.current - e.changedTouches[0].clientX)
+    touchStartY.current = null
+    touchStartX.current = null
+    if (deltaX > Math.abs(deltaY) || Math.abs(deltaY) < 50) return
+    if (deltaY > 0) onSwipeNext()
+    else onSwipePrev()
+  }
+
+  function handleMouseDown(e: MouseEvent) {
+    mouseStartY.current = e.clientY
+  }
+
+  function handleMouseUp(e: MouseEvent) {
+    if (mouseStartY.current === null) return
+    const deltaY = mouseStartY.current - e.clientY
+    mouseStartY.current = null
+    if (Math.abs(deltaY) < 50) return
+    if (deltaY > 0) onSwipeNext()
+    else onSwipePrev()
   }
 
   const wheelBlocked = useRef(false)
@@ -74,7 +119,13 @@ export function ProductFeedImage({ images, animationState, onAnimationEnd }: Pro
   const canNext = activeImageIndex < sortedImages.length - 1
 
   return (
-    <div className={styles.imageZone}>
+    <div
+      className={styles.imageZone}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+    >
       <div
         ref={wrapperRef}
         className={styles.animationWrapper}
@@ -121,6 +172,19 @@ export function ProductFeedImage({ images, animationState, onAnimationEnd }: Pro
           </>
         )}
       </div>
+
+      {showHint && (
+        <div className={styles.hint} aria-hidden="true">
+          <svg className={styles.hintArrowUp} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="18 15 12 9 6 15" />
+          </svg>
+          <span className={styles.hintText}>DESLIZÁ PARA VER</span>
+          <span className={styles.hintSubText}>EL SIGUIENTE PRODUCTO</span>
+          <svg className={styles.hintArrowDown} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+      )}
 
       {sortedImages.length > 1 && (
         <div className={styles.dots} aria-hidden="true" data-testid="dots">

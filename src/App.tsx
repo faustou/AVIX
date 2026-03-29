@@ -32,6 +32,7 @@ function AppContent() {
         onCartClick={() => setShowCart(true)}
         showBack={selectedIndex !== null}
         onBackClick={() => setSelectedIndex(null)}
+        onLogoClick={() => { setSelectedIndex(null); setActiveCategoryBar(null); setActiveCategory('new') }}
         dataOverlay={selectedIndex !== null}
         onCycle={cycle}
         columnDirection={direction}

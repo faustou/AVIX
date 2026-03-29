@@ -154,3 +154,73 @@
 .dot[data-active='true'] {
   background-color: #fff;
 }
+
+/* ── Swipe hint ── */
+
+@keyframes hintFade {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes hintBounceUp {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+
+@keyframes hintBounceDown {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(5px); }
+}
+
+.hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 18px 28px;
+  pointer-events: none;
+  animation: hintFade 3.5s ease forwards;
+  z-index: 20;
+}
+
+.hintArrowUp {
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  animation: hintBounceUp 1s ease-in-out infinite;
+}
+
+.hintArrowDown {
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  animation: hintBounceDown 1s ease-in-out infinite;
+}
+
+.hintText {
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.hintSubText {
+  font-family: var(--font-main);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  margin-top: -3px;
+}

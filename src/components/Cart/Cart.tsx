@@ -3,12 +3,17 @@ import { useCart } from '@/hooks/useCart'
 import { CycleIcon } from '@/components/Nav/CycleIcon'
 import { Checkout } from './Checkout'
 
+const FREE_SHIPPING = 140000
+
 interface CartProps {
   onClose: () => void
 }
 
 export function Cart({ onClose }: CartProps) {
   const { items, cartCount, subtotal, total, updateQuantity } = useCart()
+
+  const remaining = Math.max(0, FREE_SHIPPING - subtotal)
+  const progress = Math.min(100, (subtotal / FREE_SHIPPING) * 100)
 
   return (
     <div className={styles.overlay} data-testid="cart">
@@ -37,96 +42,174 @@ export function Cart({ onClose }: CartProps) {
       {/* Page title */}
       <div className={styles.orderTitle}>RESUMEN DEL PEDIDO</div>
 
-      {/* Items */}
-      <div className={styles.items}>
-        {items.map((item) => {
-          const firstImg = [...item.product.product_images].sort(
-            (a, b) => a.position - b.position,
-          )[0]
-          return (
-            <div
-              key={`${item.product.id}-${item.size}`}
-              className={styles.item}
-              data-testid="cart-item"
-            >
-              {firstImg && (
-                <img
-                  src={firstImg.storage_path}
-                  alt={item.product.code}
-                  className={styles.thumbnail}
-                />
-              )}
-              <div className={styles.itemInfo}>
-                <div className={styles.itemRow}>
-                  <span className={styles.itemCode} data-testid="item-code">
-                    {item.product.code}
-                  </span>
-                  <span className={styles.itemPrice} data-testid="item-price">
-                    ${item.product.price}
-                  </span>
-                </div>
-                <div className={styles.itemRow}>
-                  <span className={styles.metaLabel}>TALLE</span>
-                  <span className={styles.metaValue} data-testid="item-size">
-                    {item.size}
-                  </span>
-                </div>
-                <div className={styles.itemRow}>
-                  <span className={styles.metaLabel}>CANT.</span>
-                  <div className={styles.qtyControls}>
-                    <button
-                      className={styles.qtyButton}
-                      onClick={() =>
-                        updateQuantity(item.product.id, item.size, item.quantity + 1)
-                      }
-                      aria-label="Increase quantity"
-                      data-testid="qty-increase"
-                    >
-                      +
-                    </button>
-                    <span className={styles.qtyValue} data-testid="item-qty">
-                      {item.quantity}
-                    </span>
-                    <button
-                      className={styles.qtyButton}
-                      onClick={() =>
-                        updateQuantity(item.product.id, item.size, item.quantity - 1)
-                      }
-                      aria-label="Decrease quantity"
-                      data-testid="qty-decrease"
-                    >
-                      −
-                    </button>
+      {/* Desktop: two-column layout */}
+      <div className={styles.body}>
+
+        {/* LEFT — items + shipping */}
+        <div className={styles.left}>
+
+          {/* Items */}
+          <div className={styles.items}>
+            {items.map((item) => {
+              const firstImg = [...item.product.product_images].sort(
+                (a, b) => a.position - b.position,
+              )[0]
+              return (
+                <div
+                  key={`${item.product.id}-${item.size}`}
+                  className={styles.item}
+                  data-testid="cart-item"
+                >
+                  {firstImg && (
+                    <img
+                      src={firstImg.storage_path}
+                      alt={item.product.code}
+                      className={styles.thumbnail}
+                    />
+                  )}
+                  <div className={styles.itemInfo}>
+                    <div className={styles.itemRow}>
+                      <span className={styles.itemCode} data-testid="item-code">
+                        {item.product.code}{' '}
+                        <span className={styles.itemSize}>({item.size})</span>
+                      </span>
+                      <button
+                        className={styles.removeButton}
+                        onClick={() => updateQuantity(item.product.id, item.size, 0)}
+                        aria-label="Eliminar"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className={styles.itemRow}>
+                      <div className={styles.qtyControls}>
+                        <button
+                          className={styles.qtyButton}
+                          onClick={() => updateQuantity(item.product.id, item.size, item.quantity - 1)}
+                          aria-label="Decrease quantity"
+                          data-testid="qty-decrease"
+                        >
+                          −
+                        </button>
+                        <span className={styles.qtyValue} data-testid="item-qty">
+                          {item.quantity}
+                        </span>
+                        <button
+                          className={styles.qtyButton}
+                          onClick={() => updateQuantity(item.product.id, item.size, item.quantity + 1)}
+                          aria-label="Increase quantity"
+                          data-testid="qty-increase"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <span className={styles.itemPrice} data-testid="item-price">
+                        ${(item.product.price * item.quantity).toLocaleString('es-AR')}
+                      </span>
+                    </div>
                   </div>
                 </div>
+              )
+            })}
+          </div>
+
+          {/* Shipping options (hardcoded) */}
+          <div className={styles.shippingSection}>
+            <div className={styles.shippingSectionTitle}>ENVÍO A DOMICILIO</div>
+            <label className={styles.shippingOption}>
+              <input type="radio" name="shipping" className={styles.shippingRadio} defaultChecked />
+              <div className={styles.shippingOptionInfo}>
+                <span className={styles.shippingOptionName}>Estándar (3 a 5 días hábiles)</span>
+              </div>
+              <span className={styles.shippingOptionPrice}>SE CALCULA AL PAGAR</span>
+            </label>
+            <label className={styles.shippingOption}>
+              <input type="radio" name="shipping" className={styles.shippingRadio} />
+              <div className={styles.shippingOptionInfo}>
+                <span className={styles.shippingOptionName}>Express (1 a 2 días hábiles)</span>
+              </div>
+              <span className={styles.shippingOptionPrice}>SE CALCULA AL PAGAR</span>
+            </label>
+            <div className={styles.shippingSectionTitle} style={{ marginTop: '16px' }}>RETIRO EN TIENDA</div>
+            <label className={styles.shippingOption}>
+              <input type="radio" name="shipping" className={styles.shippingRadio} />
+              <div className={styles.shippingOptionInfo}>
+                <span className={styles.shippingOptionName}>Punto de retiro</span>
+                <span className={styles.shippingOptionSub}>Lunes a viernes, 10:00 a 18:00</span>
+              </div>
+              <span className={styles.shippingOptionPrice}>GRATIS</span>
+            </label>
+          </div>
+
+          {/* Checkout form (mobile: below shipping) */}
+          <div className={styles.checkoutMobile}>
+            <Checkout />
+            <div className={styles.safeBadge}>
+              <img src="/safe-shopping.svg" alt="" className={styles.safeBadgeIcon} />
+              <div className={styles.safeBadgeText}>
+                <span className={styles.safeBadgeLine1}>COMPRA SEGURA</span>
+                <span className={styles.safeBadgeLine2}>100% PROTEGIDO</span>
               </div>
             </div>
-          )
-        })}
-      </div>
+          </div>
+        </div>
 
-      {/* Totals */}
-      <div className={styles.totals}>
-        <div className={styles.totalRow}>
-          <span>SUBTOTAL</span>
-          <span data-testid="subtotal">${subtotal.toFixed(2)}</span>
-        </div>
-        <div className={styles.totalRow}>
-          <span>ENVÍO</span>
-          <span className={styles.muted}>SE CALCULA EN EL SIGUIENTE PASO</span>
-        </div>
-        <div className={styles.totalRow}>
-          <span>IMPUESTOS</span>
-          <span>$0.00</span>
-        </div>
-        <div className={`${styles.totalRow} ${styles.totalFinal}`}>
-          <span>TOTAL</span>
-          <span data-testid="total">${total.toFixed(2)}</span>
+        {/* RIGHT — summary */}
+        <div className={styles.right}>
+
+          {/* Barra envío gratis */}
+          <div className={styles.shippingBar}>
+            <div className={styles.shippingBarTrack}>
+              <div
+                className={styles.shippingBarFill}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            {remaining > 0 ? (
+              <p className={styles.shippingBarText}>
+                <span className={styles.shippingBarHighlight}>Envío gratis</span>
+                {' '}superando los{' '}
+                <span className={styles.shippingBarHighlight}>${FREE_SHIPPING.toLocaleString('es-AR')}</span>
+                {' '}— te faltan{' '}
+                <span className={styles.shippingBarHighlight}>${remaining.toLocaleString('es-AR')}</span>
+              </p>
+            ) : (
+              <p className={styles.shippingBarText}>
+                <span className={styles.shippingBarHighlight}>¡Envío gratis desbloqueado!</span>
+              </p>
+            )}
+          </div>
+
+          {/* Totals */}
+          <div className={styles.totals}>
+            <div className={styles.totalRow}>
+              <span>SUBTOTAL</span>
+              <span data-testid="subtotal">${subtotal.toLocaleString('es-AR')}</span>
+            </div>
+            <div className={styles.totalRow}>
+              <span>ENVÍO</span>
+              <span className={styles.muted}>SE CALCULA AL PAGAR</span>
+            </div>
+            <div className={`${styles.totalRow} ${styles.totalFinal}`}>
+              <span>TOTAL</span>
+              <span data-testid="total">${total.toLocaleString('es-AR')}</span>
+            </div>
+          </div>
+
+          {/* Checkout form (desktop: in right column) */}
+          <div className={styles.checkoutDesktop}>
+            <Checkout />
+          </div>
+
+          <div className={styles.safeBadge}>
+            <img src="/safe-shopping.svg" alt="" className={styles.safeBadgeIcon} />
+            <div className={styles.safeBadgeText}>
+              <span className={styles.safeBadgeLine1}>COMPRA SEGURA</span>
+              <span className={styles.safeBadgeLine2}>100% PROTEGIDO</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Checkout */}
-      <Checkout />
     </div>
   )
 }

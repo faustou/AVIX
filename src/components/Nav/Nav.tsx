@@ -6,6 +6,7 @@ interface NavProps {
   onCartClick: () => void
   showBack: boolean
   onBackClick: () => void
+  onLogoClick?: () => void
   dataOverlay?: boolean
   onCycle?: () => void
   columnDirection?: 'in' | 'out'
@@ -16,6 +17,7 @@ export function Nav({
   onCartClick,
   showBack,
   onBackClick,
+  onLogoClick,
   dataOverlay,
   onCycle,
   columnDirection,
@@ -49,11 +51,13 @@ export function Nav({
       </div>
 
       <div className={styles.center}>
-        <img
-          src="/favicon.png"
-          alt="AVIX"
-          className={styles.logo}
-        />
+        <button
+          className={styles.logoButton}
+          onClick={onLogoClick}
+          aria-label="Ir al inicio"
+        >
+          <img src="/favicon.png" alt="AVIX" className={styles.logo} />
+        </button>
       </div>
 
       <div className={styles.right}>
