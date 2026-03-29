@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './SizePanel.module.css'
+import { numToLetter } from '@/lib/sizes'
 import type { Product, ProductSize } from '@/types'
 
 interface SizePanelProps {
@@ -32,6 +33,9 @@ export function SizePanel({ product, isOpen, onClose, onAddToCart }: SizePanelPr
   function getSizeLabel(ps: ProductSize): string {
     if (product.size_system === 'us_eu' && sizeDisplay === 'secondary' && ps.size_eu) {
       return ps.size_eu
+    }
+    if (product.size_system === 'letter' && ps.size_us) {
+      return numToLetter(ps.size_us)
     }
     return ps.size_us ?? ps.size_eu ?? ''
   }

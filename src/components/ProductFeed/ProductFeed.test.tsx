@@ -39,13 +39,17 @@ describe('ProductFeed — Unit / Component', () => {
     expect(screen.getByTestId('product-price')).toHaveTextContent('$40')
   })
 
-  it('el panel inferior muestra INFORMATION si el producto lo tiene', () => {
+  it('el panel inferior muestra INFORMATION en el selector si el producto lo tiene', async () => {
+    const user = userEvent.setup()
     renderFeed(1) // PK-01 tiene information
+    await user.click(screen.getByTestId('add-button'))
     expect(screen.getByTestId('information-link')).toBeInTheDocument()
   })
 
-  it('el panel inferior no muestra INFORMATION si no aplica', () => {
+  it('el panel inferior no muestra INFORMATION si no aplica', async () => {
+    const user = userEvent.setup()
     renderFeed(0) // YS-01 no tiene information
+    await user.click(screen.getByTestId('add-button'))
     expect(screen.queryByTestId('information-link')).not.toBeInTheDocument()
   })
 

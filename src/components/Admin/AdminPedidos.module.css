@@ -35,8 +35,8 @@
 }
 
 .filterBtn[data-active='true'] {
-  color: #000;
-  border-bottom-color: #000;
+  color: #1e1e1e;
+  border-bottom-color: #1e1e1e;
 }
 
 .loading {
@@ -80,7 +80,7 @@
 }
 
 .tr:hover {
-  background: #fafafa;
+  background: #1e1e1e;
 }
 
 .td {
@@ -96,7 +96,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   padding: 3px 8px;
-  background: #f0f0f0;
+  background: #232222;
   color: #555;
 }
 
@@ -148,7 +148,7 @@
 }
 
 .trDetail {
-  background: #f9f9f9;
+  background: #2e1f1f;
 }
 
 .tdDetail {

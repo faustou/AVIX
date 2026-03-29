@@ -49,7 +49,7 @@ docs/
 ## Variables CSS globales (globals.css)
 ```css
 :root {
-  --color-bg: #ffffff;
+  --color-bg: #000000;
   --color-text: #000000;
   --color-muted: #999999;
   --font-main: 'Courier New', Courier, monospace;

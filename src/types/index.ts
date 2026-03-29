@@ -1,4 +1,4 @@
-export type Category = 'new' | 'mens' | 'womens' | 'slides' | 'accessories'
+export type Category = 'new' | 'joggings' | 'musculosas' | 'remeras' | 'camperas' | 'gollerias'
 
 export interface CategoryData {
   id: string
@@ -26,6 +26,7 @@ export interface Product {
   code: string
   category_slug: Category
   price: number
+  discount_price: number | null
   information: string | null
   size_system: 'us_eu' | 'letter' | 'numeric'
   created_at: string
@@ -38,6 +39,7 @@ export interface ProductFormData {
   code: string
   category_slug: Category
   price: number
+  discount_price: number | null
   information: string
   size_system: 'us_eu' | 'letter' | 'numeric'
   published: boolean

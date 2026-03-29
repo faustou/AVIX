@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+import { LETTER_SIZES, letterToNum, numToLetter } from '@/lib/sizes'
+import { supabase } from '@/lib/supabase'
 import type { Product, ProductFormData, Category } from '@/types'
 import styles from './ProductForm.module.css'
+
+function toDisplayUrl(storagePath: string): string {
+  if (storagePath.startsWith('http')) return storagePath
+  return supabase.storage.from('product-images').getPublicUrl(storagePath).data.publicUrl
+}
 
 interface ProductFormProps {
   product?: Product
@@ -10,18 +17,33 @@ interface ProductFormProps {
   onUploadImage: (file: File) => Promise<{ path: string } | { error: string }>
 }
 
-const CATEGORIES: Category[] = ['new', 'mens', 'womens', 'slides', 'accessories']
+const CATEGORIES: { slug: Category; label: string }[] = [
+  { slug: 'joggings',   label: 'Joggings' },
+  { slug: 'musculosas', label: 'Musculosas' },
+  { slug: 'remeras',    label: 'Remeras' },
+  { slug: 'camperas',   label: 'Camperas' },
+  { slug: 'gollerias',  label: 'Gollerías' },
+]
+
+// mapProduct convierte el storage_path al URL público completo para mostrarlo.
+// Al editar hay que revertir eso y guardar solo el path original en la DB.
+function extractStoragePath(urlOrPath: string): string {
+  const marker = '/product-images/'
+  const idx = urlOrPath.indexOf(marker)
+  return idx >= 0 ? urlOrPath.slice(idx + marker.length) : urlOrPath
+}
 
 function productToFormData(product: Product): ProductFormData {
   return {
     code: product.code,
     category_slug: product.category_slug,
     price: product.price,
+    discount_price: product.discount_price ?? null,
     information: product.information ?? '',
     size_system: product.size_system,
     published: product.published ?? false,
     images: product.product_images.map((img) => ({
-      storage_path: img.storage_path,
+      storage_path: extractStoragePath(img.storage_path),
       position: img.position,
     })),
     sizes: product.product_sizes.map((sz) => ({
@@ -34,8 +56,9 @@ function productToFormData(product: Product): ProductFormData {
 
 const EMPTY_FORM: ProductFormData = {
   code: '',
-  category_slug: 'new',
+  category_slug: 'joggings',
   price: 0,
+  discount_price: null,
   information: '',
   size_system: 'letter',
   published: false,
@@ -93,19 +116,37 @@ export function ProductForm({ product, onSave, onCancel, onUploadImage }: Produc
   }
 
   function addSize() {
-    if (!newSize.size_us && !newSize.size_eu) return
-    setForm((f) => ({
-      ...f,
-      sizes: [
-        ...f.sizes,
-        {
-          size_us: newSize.size_us || null,
-          size_eu: newSize.size_eu || null,
-          stock: parseInt(newSize.stock) || 0,
-        },
-      ],
-    }))
+    const stock = parseInt(newSize.stock) || 0
+    if (form.size_system === 'letter') {
+      if (!newSize.size_us) return
+      setForm((f) => ({
+        ...f,
+        sizes: [...f.sizes, { size_us: letterToNum(newSize.size_us), size_eu: null, stock }],
+      }))
+    } else if (form.size_system === 'numeric') {
+      if (!newSize.size_us) return
+      setForm((f) => ({
+        ...f,
+        sizes: [...f.sizes, { size_us: newSize.size_us, size_eu: null, stock }],
+      }))
+    } else {
+      // us_eu
+      if (!newSize.size_us && !newSize.size_eu) return
+      setForm((f) => ({
+        ...f,
+        sizes: [
+          ...f.sizes,
+          { size_us: newSize.size_us || null, size_eu: newSize.size_eu || null, stock },
+        ],
+      }))
+    }
     setNewSize({ size_us: '', size_eu: '', stock: '' })
+  }
+
+  function getSizeDisplay(sz: ProductFormData['sizes'][0]): string {
+    if (form.size_system === 'letter') return numToLetter(sz.size_us ?? '') || sz.size_us || '-'
+    if (form.size_system === 'us_eu') return `${sz.size_us ?? '-'} / ${sz.size_eu ?? '-'}`
+    return sz.size_us ?? '-'
   }
 
   function removeSize(index: number) {
@@ -147,20 +188,35 @@ export function ProductForm({ product, onSave, onCancel, onUploadImage }: Produc
           onChange={(e) => setField('category_slug', e.target.value as Category)}
         >
           {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c.toUpperCase()}
+            <option key={c.slug} value={c.slug}>
+              {c.label.toUpperCase()}
             </option>
           ))}
         </select>
 
-        <label className={styles.label}>PRECIO</label>
-        <input
-          className={styles.input}
-          data-testid="input-price"
-          type="number"
-          value={form.price}
-          onChange={(e) => setField('price', parseFloat(e.target.value) || 0)}
-        />
+        <div className={styles.priceRow}>
+          <div className={styles.priceField}>
+            <label className={styles.label}>PRECIO</label>
+            <input
+              className={styles.input}
+              data-testid="input-price"
+              type="number"
+              value={form.price}
+              onChange={(e) => setField('price', parseFloat(e.target.value) || 0)}
+            />
+          </div>
+          <div className={styles.priceField}>
+            <label className={styles.label}>PRECIO CON DESCUENTO</label>
+            <input
+              className={styles.input}
+              data-testid="input-discount-price"
+              type="number"
+              placeholder="—"
+              value={form.discount_price ?? ''}
+              onChange={(e) => setField('discount_price', e.target.value ? parseFloat(e.target.value) : null)}
+            />
+          </div>
+        </div>
 
         <label className={styles.label}>INFORMACIÓN</label>
         <textarea
@@ -217,7 +273,14 @@ export function ProductForm({ product, onSave, onCancel, onUploadImage }: Produc
                         {...dragProvided.dragHandleProps}
                         data-testid={`image-item-${index}`}
                       >
-                        <span className={styles.imagePath}>{img.storage_path.split('/').pop()}</span>
+                        <span className={styles.imageBadge}>
+                          {index === 0 ? 'PRIMARIA' : index === 1 ? 'SECUNDARIA' : `#${index + 1}`}
+                        </span>
+                        <img
+                          src={toDisplayUrl(img.storage_path)}
+                          alt=""
+                          className={styles.imageThumbnail}
+                        />
                         <button
                           className={styles.removeBtn}
                           onClick={() => removeImage(index)}
@@ -241,20 +304,38 @@ export function ProductForm({ product, onSave, onCancel, onUploadImage }: Produc
         <h3 className={styles.sectionTitle}>TALLAS</h3>
 
         <div className={styles.sizeForm}>
-          <input
-            className={styles.inputSmall}
-            placeholder="US"
-            value={newSize.size_us}
-            onChange={(e) => setNewSize((s) => ({ ...s, size_us: e.target.value }))}
-            data-testid="new-size-us"
-          />
-          <input
-            className={styles.inputSmall}
-            placeholder="EU"
-            value={newSize.size_eu}
-            onChange={(e) => setNewSize((s) => ({ ...s, size_eu: e.target.value }))}
-            data-testid="new-size-eu"
-          />
+          {form.size_system === 'letter' ? (
+            <select
+              className={styles.inputSmall}
+              value={newSize.size_us}
+              onChange={(e) => setNewSize((s) => ({ ...s, size_us: e.target.value }))}
+              data-testid="new-size-letter"
+            >
+              <option value="">TALLE</option>
+              {LETTER_SIZES.map((l) => (
+                <option key={l} value={l}>{l}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              className={styles.inputSmall}
+              placeholder="US"
+              value={newSize.size_us}
+              onChange={(e) => setNewSize((s) => ({ ...s, size_us: e.target.value }))}
+              data-testid="new-size-us"
+            />
+          )}
+
+          {form.size_system === 'us_eu' && (
+            <input
+              className={styles.inputSmall}
+              placeholder="EU"
+              value={newSize.size_eu}
+              onChange={(e) => setNewSize((s) => ({ ...s, size_eu: e.target.value }))}
+              data-testid="new-size-eu"
+            />
+          )}
+
           <input
             className={styles.inputSmall}
             placeholder="STOCK"
@@ -276,7 +357,7 @@ export function ProductForm({ product, onSave, onCancel, onUploadImage }: Produc
         <div className={styles.sizeList} data-testid="size-list">
           {form.sizes.map((sz, i) => (
             <div key={i} className={styles.sizeRow} data-testid={`size-row-${i}`}>
-              <span>{sz.size_us ?? '-'} / {sz.size_eu ?? '-'}</span>
+              <span>{getSizeDisplay(sz)}</span>
               <span>stock: {sz.stock}</span>
               <button
                 className={styles.removeBtn}

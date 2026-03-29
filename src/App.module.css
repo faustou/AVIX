@@ -25,7 +25,99 @@
   flex-direction: column;
 }
 
-@media (min-width: 1024px) {
+.waButton {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition-fast);
+}
+
+.waButton:active {
+  transform: scale(0.93);
+}
+
+.waIcon {
+  width: 26px;
+  height: 26px;
+  fill: #000000;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 16px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.footerLinks {
+  text-align: center;
+}
+
+.footerLink {
+  font-family: var(--font-main);
+  font-size: 0.6rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.footerSep {
+  font-family: var(--font-main);
+  font-size: 0.6rem;
+  color: var(--color-muted);
+}
+
+.footerCredit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.footerCreditText {
+  font-family: var(--font-main);
+  font-size: 0.6rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.footerLogo {
+  height: 16px;
+  width: auto;
+  opacity: 0.5;
+}
+
+@media (min-width: 430px) {
+  .footer {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .footerLinks {
+    flex: 1;
+    text-align: left;
+  }
+
+  .footerCredit {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 430px) {
   .app {
     max-width: 100%;
     margin: 0;

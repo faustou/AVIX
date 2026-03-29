@@ -1,71 +1,177 @@
 .infoZone {
   width: 100%;
-  flex: 0 0 35%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background-color: #000;
 }
 
-.content {
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 20px 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding-top: 20px;
-  animation: fadeIn 150ms ease;
+  gap: 8px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.scroll::-webkit-scrollbar {
+  display: none;
 }
+
+/* ── Nombre del producto ── */
 
 .code {
   font-family: var(--font-main);
-  font-size: 0.7rem;
-  letter-spacing: var(--letter-spacing);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-muted);
+  color: #fff;
+  line-height: 1.15;
+}
+
+/* ── Precio ── */
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .price {
   font-family: var(--font-main);
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 700;
   letter-spacing: var(--letter-spacing);
-  text-transform: uppercase;
-  color: var(--color-text);
+  color: #fff;
 }
 
-.addButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--color-text);
-  font-size: 1.25rem;
+.priceOriginal {
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  letter-spacing: var(--letter-spacing);
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+}
+
+/* ── Stock ── */
+
+.stock {
+  font-family: var(--font-main);
+  font-size: 0.62rem;
+  letter-spacing: var(--letter-spacing);
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+/* ── Talles ── */
+
+.talleRow {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: transform var(--transition-slide);
-  background: none;
-  cursor: pointer;
-  font-family: var(--font-main);
-  color: var(--color-text);
+  gap: 12px;
+  padding-top: 2px;
 }
 
-.addButton[data-open='true'] {
-  transform: translate(8px, -8px) rotate(45deg);
-}
-
-.information {
+.talleLabel {
   font-family: var(--font-main);
   font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: var(--letter-spacing);
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sizes {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: wrap;
+}
+
+.sizes::-webkit-scrollbar {
+  display: none;
+}
+
+.sizeBtn {
+  font-family: var(--font-main);
+  font-size: 0.68rem;
+  font-weight: 700;
   letter-spacing: var(--letter-spacing);
   text-transform: uppercase;
-  color: var(--color-muted);
-  background: none;
-  border: none;
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 7px 11px;
   cursor: pointer;
-  padding: 0;
-  margin-top: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
+
+.sizeBtn:disabled {
+  color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.08);
+  text-decoration: line-through;
+  cursor: default;
+}
+
+.sizeBtnActive {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+/* ── Botón agregar al carrito ── */
+
+.addBtn {
+  font-family: var(--font-main);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  width: 100%;
+  padding: 14px 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: default;
+  margin-top: 6px;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.addBtnActive {
+  border-color: #fff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.addBtnActive:active {
+  background: #fff;
+  color: #000;
+}
+
+/* ── Descripción ── */
+
+.infoText {
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: lowercase;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.7;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+

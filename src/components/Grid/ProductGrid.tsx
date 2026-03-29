@@ -5,24 +5,22 @@ interface ProductGridProps {
   products: Product[]
   onProductSelect: (index: number) => void
   columns: number
-  desktopColumns?: 6 | 3
 }
 
 const FOOTER_LINKS = ['CONTACT', 'TERMS', 'PRIVACY', 'ACCESSIBILITY', 'DNSMPI', 'COOKIES']
 
-export function ProductGrid({ products, onProductSelect, columns, desktopColumns = 6 }: ProductGridProps) {
+export function ProductGrid({ products, onProductSelect, columns }: ProductGridProps) {
   return (
     <div className={styles.wrapper}>
       <div
         className={styles.grid}
         data-columns={columns}
-        data-columns-desktop={desktopColumns}
         data-testid="product-grid"
       >
         {products.map((product, i) => {
-          const firstImage = [...product.product_images].sort(
-            (a, b) => a.position - b.position,
-          )[0]
+          const sorted = [...product.product_images].sort((a, b) => a.position - b.position)
+          const primary = sorted[0]
+          const secondary = sorted[1]
           return (
             <button
               key={product.id}
@@ -30,33 +28,46 @@ export function ProductGrid({ products, onProductSelect, columns, desktopColumns
               onClick={() => onProductSelect(i)}
               data-testid={`grid-cell-${i}`}
             >
-              {firstImage && (
-                <img
-                  src={firstImage.storage_path}
-                  alt={product.code}
-                  className={styles.image}
-                />
-              )}
+              <div className={styles.imageWrapper}>
+                {primary && (
+                  <img
+                    src={primary.storage_path}
+                    alt={product.code}
+                    className={styles.imagePrimary}
+                  />
+                )}
+                {secondary && (
+                  <img
+                    src={secondary.storage_path}
+                    alt=""
+                    className={styles.imageSecondary}
+                  />
+                )}
+              </div>
               <span className={styles.code} data-testid={`product-code-${i}`}>
                 {product.code}
               </span>
+              <div className={styles.priceRow}>
+                {product.discount_price ? (
+                  <>
+                    <span className={styles.priceOriginal}>
+                      ${product.price.toLocaleString('es-AR')}
+                    </span>
+                    <span className={styles.priceDiscount}>
+                      ${product.discount_price.toLocaleString('es-AR')}
+                    </span>
+                  </>
+                ) : (
+                  <span className={styles.price}>
+                    ${product.price.toLocaleString('es-AR')}
+                  </span>
+                )}
+              </div>
             </button>
           )
         })}
       </div>
 
-      <footer className={styles.footer} data-testid="grid-footer">
-        <nav aria-label="Legal links">
-          {FOOTER_LINKS.map((link, i) => (
-            <span key={link}>
-              {i > 0 && <span className={styles.separator}> · </span>}
-              <span className={styles.footerLink} data-testid={`footer-link-${link.toLowerCase()}`}>
-                {link}
-              </span>
-            </span>
-          ))}
-        </nav>
-      </footer>
     </div>
   )
 }

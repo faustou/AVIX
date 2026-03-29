@@ -86,7 +86,7 @@ describe('ProductForm', () => {
   it('agrega talla al hacer click en + con datos', async () => {
     renderForm()
     const user = userEvent.setup()
-    await user.type(screen.getByTestId('new-size-us'), 'M')
+    await user.selectOptions(screen.getByTestId('new-size-letter'), 'M')
     await user.type(screen.getByTestId('new-size-stock'), '5')
     await user.click(screen.getByTestId('add-size-btn'))
     expect(screen.getByTestId('size-row-0')).toBeInTheDocument()

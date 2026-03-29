@@ -1,10 +1,7 @@
 import styles from './Nav.module.css'
 import { CycleIcon } from './CycleIcon'
-import type { Category } from '@/types'
 
 interface NavProps {
-  activeCategory: Category
-  onCategoryChange: (cat: Category) => void
   cartCount: number
   onCartClick: () => void
   showBack: boolean
@@ -12,16 +9,9 @@ interface NavProps {
   dataOverlay?: boolean
   onCycle?: () => void
   columnDirection?: 'in' | 'out'
-  desktopColumns?: 6 | 3
-  onDesktopToggle?: () => void
 }
 
-const ROW_1: Category[] = ['new', 'mens', 'womens']
-const ROW_2: Category[] = ['slides', 'accessories']
-
 export function Nav({
-  activeCategory,
-  onCategoryChange,
   cartCount,
   onCartClick,
   showBack,
@@ -29,8 +19,6 @@ export function Nav({
   dataOverlay,
   onCycle,
   columnDirection,
-  desktopColumns,
-  onDesktopToggle,
 }: NavProps) {
   return (
     <nav
@@ -49,59 +37,24 @@ export function Nav({
             <CycleIcon direction="out" />
           </button>
         ) : (
-          <>
-            {/* Mobile: ciclo de columnas */}
-            <button
-              className={`${styles.cycleButton} ${styles.mobileOnly}`}
-              onClick={onCycle}
-              aria-label="Change columns"
-              data-testid="cycle-button"
-            >
-              <CycleIcon direction={columnDirection ?? 'in'} />
-            </button>
-            {/* Desktop: toggle 6/3 columnas */}
-            <button
-              className={`${styles.cycleButton} ${styles.desktopOnly}`}
-              onClick={onDesktopToggle}
-              aria-label="Toggle columns"
-              data-testid="desktop-toggle-button"
-            >
-              {desktopColumns === 6 ? '−' : '+'}
-            </button>
-          </>
+          <button
+            className={styles.cycleButton}
+            onClick={onCycle}
+            aria-label="Change columns"
+            data-testid="cycle-button"
+          >
+            <CycleIcon direction={columnDirection ?? 'in'} />
+          </button>
         )}
       </div>
 
-      {!showBack && (
-        <div className={styles.center}>
-          <div className={styles.row}>
-            {ROW_1.map((cat) => (
-              <button
-                key={cat}
-                className={styles.category}
-                data-active={cat === activeCategory ? 'true' : 'false'}
-                onClick={() => onCategoryChange(cat)}
-                data-testid={`category-${cat}`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-          <div className={styles.row}>
-            {ROW_2.map((cat) => (
-              <button
-                key={cat}
-                className={styles.category}
-                data-active={cat === activeCategory ? 'true' : 'false'}
-                onClick={() => onCategoryChange(cat)}
-                data-testid={`category-${cat}`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className={styles.center}>
+        <img
+          src="/favicon.png"
+          alt="AVIX"
+          className={styles.logo}
+        />
+      </div>
 
       <div className={styles.right}>
         <button

@@ -1,7 +1,7 @@
 import { forwardRef, useRef, useState } from 'react'
 import styles from './ProductFeedItem.module.css'
-import { SizePanel } from '@/components/SizePanel/SizePanel'
-import type { Product } from '@/types'
+import { numToLetter } from '@/lib/sizes'
+import type { Product, ProductSize } from '@/types'
 
 interface Props {
   product: Product
@@ -9,21 +9,50 @@ interface Props {
   onAddToCart: (product: Product, size: string) => void
 }
 
+// TODO: reemplazar con el número real (ej: 5491112345678)
+const WA_NUMBER = '5491100000000'
+
 export const ProductFeedItem = forwardRef<HTMLDivElement, Props>(
   function ProductFeedItem({ product, isActive, onAddToCart }, ref) {
     const [activeImageIndex, setActiveImageIndex] = useState(0)
-    const [isPanelOpen, setIsPanelOpen] = useState(false)
+    const [selectedSize, setSelectedSize] = useState<string | null>(null)
+    const [isAdding, setIsAdding] = useState(false)
     const carouselRef = useRef<HTMLDivElement>(null)
+    const addTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const sortedImages = [...product.product_images].sort(
       (a, b) => a.position - b.position,
     )
+
+    const totalStock = product.product_sizes.reduce(
+      (sum, ps) => sum + (ps.stock ?? 0),
+      0,
+    )
+
+    function getSizeLabel(ps: ProductSize): string {
+      if (product.size_system === 'letter' && ps.size_us) {
+        return numToLetter(ps.size_us)
+      }
+      return ps.size_us ?? ps.size_eu ?? ''
+    }
 
     function handleCarouselScroll() {
       const el = carouselRef.current
       if (!el) return
       const index = Math.round(el.scrollLeft / el.clientWidth)
       setActiveImageIndex(index)
+    }
+
+    function handleSizeClick(size: string) {
+      if (isAdding) return
+      setSelectedSize(size)
+      setIsAdding(true)
+      if (addTimerRef.current) clearTimeout(addTimerRef.current)
+      addTimerRef.current = setTimeout(() => {
+        onAddToCart(product, size)
+        setSelectedSize(null)
+        setIsAdding(false)
+      }, 600)
     }
 
     return (
@@ -33,6 +62,7 @@ export const ProductFeedItem = forwardRef<HTMLDivElement, Props>(
         data-active={isActive ? 'true' : 'false'}
         data-testid="feed-item"
       >
+        {/* Carousel */}
         <div
           ref={carouselRef}
           className={styles.carousel}
@@ -49,6 +79,7 @@ export const ProductFeedItem = forwardRef<HTMLDivElement, Props>(
           ))}
         </div>
 
+        {/* Dots */}
         {sortedImages.length > 1 && (
           <div className={styles.dots} aria-hidden="true" data-testid="dots">
             {sortedImages.map((img, i) => (
@@ -60,35 +91,54 @@ export const ProductFeedItem = forwardRef<HTMLDivElement, Props>(
           </div>
         )}
 
+        {/* Info */}
         <div className={styles.info}>
           <span className={styles.code} data-testid="product-code">
             {product.code}
           </span>
           <span className={styles.price} data-testid="product-price">
-            ${product.price}
+            ${product.price.toLocaleString('es-AR')}
           </span>
-          <button
-            className={styles.addButton}
-            aria-label="Add to cart"
-            data-testid="add-button"
-            data-open={isPanelOpen ? 'true' : 'false'}
-            onClick={() => setIsPanelOpen(true)}
-          >
-            +
-          </button>
-          {product.information && (
-            <button className={styles.information} data-testid="information-link">
-              INFORMATION
-            </button>
+          {totalStock > 0 && (
+            <span className={styles.stock}>{totalStock} en stock</span>
           )}
         </div>
 
-        <SizePanel
-          product={product}
-          isOpen={isPanelOpen}
-          onClose={() => setIsPanelOpen(false)}
-          onAddToCart={onAddToCart}
-        />
+        {/* Barra de talles */}
+        <div className={styles.sizeBar}>
+          <span className={styles.talleLabel}>TALLE</span>
+          <div className={styles.sizes} data-testid="size-panel">
+            {product.product_sizes.map((ps) => {
+              const label = getSizeLabel(ps)
+              const unavailable = (ps.stock ?? 0) <= 0
+              const isSelected = selectedSize === label
+              return (
+                <button
+                  key={ps.id}
+                  className={`${styles.sizeBtn} ${isSelected ? styles.sizeBtnSelected : ''}`}
+                  disabled={unavailable || isAdding}
+                  onClick={() => handleSizeClick(label)}
+                  data-testid={`size-${label}`}
+                >
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* WhatsApp */}
+        <a
+          href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Hola! Consulto por ${product.code}`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.waButton}
+          aria-label="Consultar por WhatsApp"
+        >
+          <svg className={styles.waIcon} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        </a>
       </div>
     )
   },

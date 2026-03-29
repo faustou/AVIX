@@ -1,0 +1,97 @@
+.bar {
+  width: 100%;
+  background-color: var(--color-bg);
+  padding: 10px 0 6px;
+  flex-shrink: 0;
+}
+
+.scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 0 12px 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 430px) {
+  .scroll {
+    justify-content: center;
+  }
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Item ── */
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  flex-shrink: 0;
+}
+
+.item:disabled {
+  cursor: default;
+}
+
+/* ── Círculo ── */
+
+.circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-main);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.itemActive .circle {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.itemSoon .circle {
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Label ── */
+
+.label {
+  font-family: var(--font-main);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-fast);
+}
+
+.itemActive .label {
+  color: #fff;
+}
+
+.itemSoon .label {
+  color: rgba(255, 255, 255, 0.2);
+}

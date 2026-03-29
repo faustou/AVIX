@@ -72,4 +72,43 @@ describe('useColumnCycle', () => {
     act(() => result.current.cycle())
     expect(result.current.direction).toBe('out')
   })
+
+  // ── Desktop ──
+  it('en desktop el estado inicial es 6 columnas', () => {
+    const { result } = renderHook(() => useColumnCycle(true))
+    expect(result.current.columns).toBe(6)
+  })
+
+  it('en desktop cicla 6 → 3', () => {
+    const { result } = renderHook(() => useColumnCycle(true))
+    act(() => result.current.cycle())
+    expect(result.current.columns).toBe(3)
+  })
+
+  it('en desktop cicla 3 → 6', () => {
+    const { result } = renderHook(() => useColumnCycle(true))
+    act(() => result.current.cycle())
+    act(() => result.current.cycle())
+    expect(result.current.columns).toBe(6)
+  })
+
+  it("en desktop direction='in' cuando columns=6", () => {
+    const { result } = renderHook(() => useColumnCycle(true))
+    expect(result.current.direction).toBe('in')
+  })
+
+  it("en desktop direction='out' cuando columns=3", () => {
+    const { result } = renderHook(() => useColumnCycle(true))
+    act(() => result.current.cycle())
+    expect(result.current.direction).toBe('out')
+  })
+
+  it('el comportamiento mobile no cambia cuando isDesktop=false', () => {
+    const { result } = renderHook(() => useColumnCycle(false))
+    expect(result.current.columns).toBe(3)
+    act(() => result.current.cycle())
+    expect(result.current.columns).toBe(2)
+    act(() => result.current.cycle())
+    expect(result.current.columns).toBe(1)
+  })
 })

@@ -62,8 +62,8 @@
 }
 
 .tab[data-active='true'] {
-  color: #000000;
-  border-bottom-color: #000000;
+  color: #ffffff;
+  border-bottom-color: #ffffff;
 }
 
 .content {
