@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import type { WheelEvent, TouchEvent, MouseEvent } from 'react'
 import styles from './ProductFeedImage.module.css'
 import type { ProductImage } from '@/types'
@@ -85,6 +85,26 @@ export function ProductFeedImage({ images, animationState, onAnimationEnd, onSwi
 
   const wheelBlocked = useRef(false)
 
+  // Wheel sobre la imagen → cambia producto
+  const productWheelBlocked = useRef(false)
+
+  const handleImageZoneWheel = useCallback((e: WheelEvent) => {
+    // Si el carousel tiene overflow horizontal activo, no interceptar (lo maneja handleCarouselWheel)
+    const el = carouselRef.current
+    if (el) {
+      const imageWidth = getImageWidth(el)
+      const hasOverflow = imageWidth * sortedImages.length > el.clientWidth
+      if (hasOverflow) return
+    }
+    if (Math.abs(e.deltaY) < 30) return
+    if (productWheelBlocked.current) return
+    e.stopPropagation()
+    productWheelBlocked.current = true
+    setTimeout(() => { productWheelBlocked.current = false }, 700)
+    if (e.deltaY > 0) onSwipeNext?.()
+    else onSwipePrev?.()
+  }, [sortedImages.length, onSwipeNext, onSwipePrev])
+
   function scrollToImage(index: number) {
     const el = carouselRef.current
     if (!el) return
@@ -125,6 +145,7 @@ export function ProductFeedImage({ images, animationState, onAnimationEnd, onSwi
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
+      onWheel={handleImageZoneWheel}
     >
       <div
         ref={wrapperRef}

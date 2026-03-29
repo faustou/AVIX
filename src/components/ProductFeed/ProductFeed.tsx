@@ -1,5 +1,4 @@
-import { useState, useRef } from 'react'
-import type { WheelEvent } from 'react'
+import { useState } from 'react'
 import styles from './ProductFeed.module.css'
 import { ProductFeedImage } from './ProductFeedImage'
 import { ProductFeedInfo } from './ProductFeedInfo'
@@ -48,22 +47,10 @@ export function ProductFeed({ products, initialIndex, onAddToCart, onProductChan
     }
   }
 
-  const wheelBlocked = useRef(false)
-
-  function handleWheel(e: WheelEvent) {
-    if (Math.abs(e.deltaY) < 30) return
-    if (wheelBlocked.current) return
-    wheelBlocked.current = true
-    setTimeout(() => { wheelBlocked.current = false }, 700)
-    if (e.deltaY > 0) goNext()
-    else goPrev()
-  }
-
   return (
     <div
       className={styles.container}
       data-testid="product-feed"
-      onWheel={handleWheel}
     >
       <ProductFeedImage
         images={products[displayIndex].product_images}
