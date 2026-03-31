@@ -49,6 +49,26 @@ const mockCartItems = [
   },
 ]
 
+const mockCheckoutData = {
+  email: 'buyer@test.com',
+  shippingAddress: {
+    nombre: 'Juan',
+    apellido: 'Pérez',
+    calle: 'Av. Corrientes',
+    numero: '1234',
+    cp: '1414',
+    localidad: 'CABA',
+    provincia: 'C',
+  },
+  shippingOption: {
+    correo_id: 1,
+    correo_nombre: 'OCA',
+    valor: 0,
+    horas_entrega: 48,
+    fecha_estimada: '2026-04-04',
+  },
+}
+
 beforeEach(() => {
   mockChain.select.mockReset().mockReturnValue(mockChain)
   mockChain.insert.mockReset().mockReturnValue(mockChain)
@@ -75,7 +95,7 @@ describe('useCheckout', () => {
     const { result } = renderHook(() => useCheckout())
 
     await act(async () => {
-      await result.current.startCheckout('buyer@test.com')
+      await result.current.startCheckout(mockCheckoutData)
     })
 
     expect(supabase.from).toHaveBeenCalledWith('orders')
@@ -88,7 +108,7 @@ describe('useCheckout', () => {
     const { result } = renderHook(() => useCheckout())
 
     await act(async () => {
-      await result.current.startCheckout('buyer@test.com')
+      await result.current.startCheckout(mockCheckoutData)
     })
 
     expect(supabase.from).toHaveBeenCalledWith('order_items')
@@ -109,7 +129,7 @@ describe('useCheckout', () => {
     const { result } = renderHook(() => useCheckout())
 
     await act(async () => {
-      await result.current.startCheckout('buyer@test.com')
+      await result.current.startCheckout(mockCheckoutData)
     })
 
     expect(mockFetch).toHaveBeenCalledWith(
@@ -131,7 +151,7 @@ describe('useCheckout', () => {
 
     let preferenceId: string | null = null
     await act(async () => {
-      preferenceId = await result.current.startCheckout('buyer@test.com')
+      preferenceId = await result.current.startCheckout(mockCheckoutData)
     })
 
     expect(preferenceId).toBe('pref-123')
@@ -144,7 +164,7 @@ describe('useCheckout', () => {
 
     let preferenceId: string | null = 'initial'
     await act(async () => {
-      preferenceId = await result.current.startCheckout('buyer@test.com')
+      preferenceId = await result.current.startCheckout(mockCheckoutData)
     })
 
     expect(preferenceId).toBeNull()
@@ -157,7 +177,7 @@ describe('useCheckout', () => {
     expect(result.current.loading).toBe(false)
 
     await act(async () => {
-      await result.current.startCheckout('buyer@test.com')
+      await result.current.startCheckout(mockCheckoutData)
     })
 
     await waitFor(() => expect(result.current.loading).toBe(false))
