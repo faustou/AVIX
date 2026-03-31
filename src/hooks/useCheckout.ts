@@ -1,29 +1,44 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useCart } from '@/hooks/useCart'
+import type { ShippingAddress, ShippingOption } from '@/types'
+
+interface CheckoutData {
+  email: string
+  shippingAddress: ShippingAddress
+  shippingOption: ShippingOption
+}
 
 export function useCheckout(): {
   loading: boolean
   error: string | null
-  startCheckout: (email: string) => Promise<string | null>
+  startCheckout: (data: CheckoutData) => Promise<string | null>
 } {
   const { items, subtotal } = useCart()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function startCheckout(email: string): Promise<string | null> {
+  async function startCheckout(data: CheckoutData): Promise<string | null> {
+    const { email, shippingAddress, shippingOption } = data
     setLoading(true)
     setError(null)
 
     try {
-      // DEBUG TEMPORAL — remover antes de producción final
-      console.log('SUPABASE URL:', import.meta.env.VITE_SUPABASE_URL)
-      console.log('ANON KEY (primeros 20 chars):', import.meta.env.VITE_SUPABASE_ANON_KEY?.substring(0, 20))
+      const total = subtotal + shippingOption.valor
 
-      // 1. Crear orden
+      // 1. Crear orden con datos de envío
       const { data: order, error: orderErr } = await supabase
         .from('orders')
-        .insert({ email, total: subtotal, status: 'pending' })
+        .insert({
+          email,
+          total,
+          status: 'pending',
+          shipping_carrier: shippingOption.correo_nombre,
+          shipping_cost: shippingOption.valor,
+          shipping_estimated_hours: shippingOption.horas_entrega,
+          shipping_estimated_date: shippingOption.fecha_estimada,
+          shipping_address: shippingAddress,
+        })
         .select()
         .single()
 
@@ -47,7 +62,7 @@ export function useCheckout(): {
         return null
       }
 
-      // 3. Llamar Edge Function
+      // 3. Llamar Edge Function con total que incluye envío
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-mp-preference`,
         {
@@ -57,12 +72,20 @@ export function useCheckout(): {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
-            items: items.map((i) => ({
-              title: i.product.code,
-              quantity: i.quantity,
-              unit_price: i.product.price,
-              size: i.size,
-            })),
+            items: [
+              ...items.map((i) => ({
+                title: i.product.code,
+                quantity: i.quantity,
+                unit_price: i.product.price,
+                size: i.size,
+              })),
+              {
+                title: `Envío - ${shippingOption.correo_nombre}`,
+                quantity: 1,
+                unit_price: shippingOption.valor,
+                size: '',
+              },
+            ],
             email,
             orderId: order.id,
           }),
@@ -75,8 +98,8 @@ export function useCheckout(): {
         return null
       }
 
-      const data = await response.json()
-      return data.preferenceId ?? null
+      const responseData = await response.json()
+      return responseData.preferenceId ?? null
     } catch (e) {
       setError((e as Error).message)
       return null

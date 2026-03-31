@@ -31,6 +31,7 @@ export interface Product {
   size_system: 'us_eu' | 'letter' | 'numeric'
   created_at: string
   published?: boolean | null
+  peso?: number | null
   product_images: ProductImage[]
   product_sizes: ProductSize[]
 }
@@ -57,6 +58,26 @@ export interface CartState {
   items: CartItem[]
 }
 
+export interface ShippingAddress {
+  nombre: string
+  apellido: string
+  calle: string
+  numero: string
+  piso?: string
+  depto?: string
+  cp: string
+  localidad: string
+  provincia: string
+}
+
+export interface ShippingOption {
+  correo_id: number
+  correo_nombre: string
+  valor: number
+  horas_entrega: number | null
+  fecha_estimada: string | null
+}
+
 export interface Order {
   id: string
   email: string
@@ -65,6 +86,12 @@ export interface Order {
   status: 'pending' | 'paid' | 'failed'
   total: number
   created_at: string
+  shipping_carrier?: string | null
+  shipping_service?: string | null
+  shipping_cost?: number | null
+  shipping_estimated_hours?: number | null
+  shipping_estimated_date?: string | null
+  shipping_address?: ShippingAddress | null
 }
 
 export type OrderStatus = 'pending' | 'paid' | 'failed' | 'shipped'

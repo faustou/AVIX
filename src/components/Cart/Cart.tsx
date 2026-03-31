@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import styles from './Cart.module.css'
 import { useCart } from '@/hooks/useCart'
 import { CycleIcon } from '@/components/Nav/CycleIcon'
@@ -10,7 +11,8 @@ interface CartProps {
 }
 
 export function Cart({ onClose }: CartProps) {
-  const { items, cartCount, subtotal, total, updateQuantity } = useCart()
+  const { items, cartCount, subtotal, updateQuantity } = useCart()
+  const [shippingCost, setShippingCost] = useState<number | null>(null)
 
   const remaining = Math.max(0, FREE_SHIPPING - subtotal)
   const progress = Math.min(100, (subtotal / FREE_SHIPPING) * 100)
@@ -113,37 +115,9 @@ export function Cart({ onClose }: CartProps) {
             })}
           </div>
 
-          {/* Shipping options (hardcoded) */}
-          <div className={styles.shippingSection}>
-            <div className={styles.shippingSectionTitle}>ENVÍO A DOMICILIO</div>
-            <label className={styles.shippingOption}>
-              <input type="radio" name="shipping" className={styles.shippingRadio} defaultChecked />
-              <div className={styles.shippingOptionInfo}>
-                <span className={styles.shippingOptionName}>Estándar (3 a 5 días hábiles)</span>
-              </div>
-              <span className={styles.shippingOptionPrice}>SE CALCULA AL PAGAR</span>
-            </label>
-            <label className={styles.shippingOption}>
-              <input type="radio" name="shipping" className={styles.shippingRadio} />
-              <div className={styles.shippingOptionInfo}>
-                <span className={styles.shippingOptionName}>Express (1 a 2 días hábiles)</span>
-              </div>
-              <span className={styles.shippingOptionPrice}>SE CALCULA AL PAGAR</span>
-            </label>
-            <div className={styles.shippingSectionTitle} style={{ marginTop: '16px' }}>RETIRO EN TIENDA</div>
-            <label className={styles.shippingOption}>
-              <input type="radio" name="shipping" className={styles.shippingRadio} />
-              <div className={styles.shippingOptionInfo}>
-                <span className={styles.shippingOptionName}>Punto de retiro</span>
-                <span className={styles.shippingOptionSub}>Lunes a viernes, 10:00 a 18:00</span>
-              </div>
-              <span className={styles.shippingOptionPrice}>GRATIS</span>
-            </label>
-          </div>
-
-          {/* Checkout form (mobile: below shipping) */}
+          {/* Checkout form (mobile: below items) */}
           <div className={styles.checkoutMobile}>
-            <Checkout />
+            <Checkout onShippingCostChange={setShippingCost} />
           </div>
         </div>
 
@@ -181,17 +155,23 @@ export function Cart({ onClose }: CartProps) {
             </div>
             <div className={styles.totalRow}>
               <span>ENVÍO</span>
-              <span className={styles.muted}>SE CALCULA AL PAGAR</span>
+              {shippingCost !== null ? (
+                <span data-testid="shipping-cost">${shippingCost.toLocaleString('es-AR')}</span>
+              ) : (
+                <span className={styles.muted}>CALCULÁ ABAJO</span>
+              )}
             </div>
             <div className={`${styles.totalRow} ${styles.totalFinal}`}>
               <span>TOTAL</span>
-              <span data-testid="total">${total.toLocaleString('es-AR')}</span>
+              <span data-testid="total">
+                ${(subtotal + (shippingCost ?? 0)).toLocaleString('es-AR')}
+              </span>
             </div>
           </div>
 
           {/* Checkout form (desktop: in right column) */}
           <div className={styles.checkoutDesktop}>
-            <Checkout />
+            <Checkout onShippingCostChange={setShippingCost} />
           </div>
 
           <div className={styles.safeBadge}>

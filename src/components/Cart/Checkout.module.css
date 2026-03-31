@@ -6,6 +6,45 @@
   padding-bottom: 40px;
 }
 
+.sectionTitle {
+  font-family: var(--font-main);
+  font-size: 0.6rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding-top: 4px;
+  border-top: 1px solid #e8e8e8;
+  margin-top: 4px;
+}
+
+.sectionTitle:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.fieldRow {
+  display: flex;
+  gap: 12px;
+}
+
+.fieldRow .fieldGroup {
+  flex: 1;
+}
+
+.fieldGroupWide {
+  flex: 2 !important;
+}
+
+.shippingHint {
+  font-family: var(--font-main);
+  font-size: 0.55rem;
+  letter-spacing: var(--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-muted);
+  text-align: center;
+}
+
 .fieldGroup {
   display: flex;
   flex-direction: column;
