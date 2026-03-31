@@ -73,7 +73,10 @@ export function ShippingCalculator({
         },
       )
 
-      if (!res.ok) throw new Error('Error al cotizar')
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error ?? `Error ${res.status}`)
+      }
 
       const data: ShippingOption[] = await res.json()
 
@@ -83,8 +86,8 @@ export function ShippingCalculator({
       }
 
       setOptions(data)
-    } catch {
-      setError('No pudimos calcular el envío, verificá el código postal')
+    } catch (e) {
+      setError((e as Error).message)
     } finally {
       setLoading(false)
     }
