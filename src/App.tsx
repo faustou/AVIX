@@ -12,6 +12,7 @@ import { CategoryBar } from '@/components/CategoryBar/CategoryBar'
 import { ProductGrid } from '@/components/Grid/ProductGrid'
 import { ProductFeed } from '@/components/ProductFeed/ProductFeed'
 import { Cart } from '@/components/Cart/Cart'
+import { HeroVideo } from '@/components/HeroVideo/HeroVideo'
 import type { Category } from '@/types'
 
 function AppContent() {
@@ -77,6 +78,8 @@ function AppContent() {
         columnDirection={direction}
       />
 
+      {selectedIndex === null && <HeroVideo />}
+
       {selectedIndex === null && (
         <CategoryBar
           active={activeCategoryBar}
@@ -100,11 +103,13 @@ function AppContent() {
           ERROR AL CARGAR PRODUCTOS
         </div>
       ) : selectedIndex === null ? (
-        <ProductGrid
+        <>
+          <ProductGrid
           products={products}
           onProductSelect={handleProductSelect}
           columns={columns}
         />
+        </>
       ) : (
         <ProductFeed
           products={products}
