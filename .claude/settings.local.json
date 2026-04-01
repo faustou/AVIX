@@ -8,7 +8,8 @@
       "Bash(npm run:*)",
       "Bash(ls -la \"c:\\\\Users\\\\Fausto\\\\Desktop\\\\AVIX\\\\src\\\\test\"\" 2>/dev/null || echo \"Directorio no existe \")",
       "Bash(find /c/Users/fscarmato/avix -maxdepth 3 -not -path */node_modules/* -not -path */.git/* -type d)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls c:/Users/fscarmato/avix/.env*)"
     ]
   }
 }

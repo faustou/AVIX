@@ -70,6 +70,7 @@
   letter-spacing: var(--letter-spacing);
   text-transform: uppercase;
   color: var(--color-muted);
+  text-decoration: none;
 }
 
 .footerSep {

@@ -10,6 +10,7 @@ import { AdminProductos } from '@/components/Admin/AdminProductos'
 import { AdminPedidos } from '@/components/Admin/AdminPedidos'
 import { CheckoutSuccess } from '@/components/Checkout/CheckoutSuccess'
 import { CheckoutFailure } from '@/components/Checkout/CheckoutFailure'
+import { Contacto } from '@/pages/Contacto/Contacto'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/checkout/success" element={<CheckoutSuccess />} />
         <Route path="/checkout/failure" element={<CheckoutFailure />} />
+        <Route path="/contacto" element={<Contacto />} />
         <Route path="/admin" element={<Navigate to="/admin/productos" replace />} />
         <Route
           path="/admin/productos"

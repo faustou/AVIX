@@ -128,10 +128,21 @@ function AppContent() {
       {selectedIndex === null && (
         <footer className={styles.footer} data-testid="grid-footer">
           <nav className={styles.footerLinks} aria-label="Legal links">
-            {['CONTACT','TERMS','PRIVACY','ACCESSIBILITY','DNSMPI','COOKIES'].map((link, i) => (
-              <span key={link}>
+            {[
+              { label: 'CONTACT', href: '/contacto' },
+              { label: 'TERMS', href: null },
+              { label: 'PRIVACY', href: null },
+              { label: 'ACCESSIBILITY', href: null },
+              { label: 'DNSMPI', href: null },
+              { label: 'COOKIES', href: null },
+            ].map(({ label, href }, i) => (
+              <span key={label}>
                 {i > 0 && <span className={styles.footerSep}> · </span>}
-                <span className={styles.footerLink}>{link}</span>
+                {href ? (
+                  <a href={href} className={styles.footerLink}>{label}</a>
+                ) : (
+                  <span className={styles.footerLink}>{label}</span>
+                )}
               </span>
             ))}
           </nav>
