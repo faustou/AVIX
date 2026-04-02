@@ -66,6 +66,7 @@ const mockCheckoutData = {
     valor: 0,
     horas_entrega: 48,
     fecha_estimada: '2026-04-04',
+    modalidad: 'D',
   },
 }
 
