@@ -27,6 +27,7 @@ export function useCheckout(): {
       const total = subtotal + shippingOption.valor
 
       // 1. Crear orden con datos de envío
+      console.log('[checkout] correo_id a insertar:', shippingOption.correo_id, typeof shippingOption.correo_id)
       const { data: order, error: orderErr } = await supabase
         .from('orders')
         .insert({
@@ -34,6 +35,8 @@ export function useCheckout(): {
           total,
           status: 'pending',
           shipping_carrier: shippingOption.correo_nombre,
+          shipping_correo_id: shippingOption.correo_id,
+          shipping_modalidad: shippingOption.modalidad,
           shipping_cost: shippingOption.valor,
           shipping_estimated_hours: shippingOption.horas_entrega,
           shipping_estimated_date: shippingOption.fecha_estimada,

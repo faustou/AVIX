@@ -61,7 +61,7 @@ Deno.serve(async (req: Request) => {
     }
 
     // Calcular peso total (default 0.5kg por item)
-    const pesoTotal = items.reduce((acc, item) => acc + (item.peso ?? 0.5), 0)
+    const pesoTotal = Math.max(0.5, items.reduce((acc, item) => acc + (item.peso ?? 0.5), 0))
 
     const depositId = Deno.env.get('ENVIOPACK_DEPOSIT_ID')
     if (!depositId) {
@@ -80,6 +80,7 @@ Deno.serve(async (req: Request) => {
     url.searchParams.set('peso', String(pesoTotal))
     url.searchParams.set('direccion_envio', depositId)
 
+    console.log('QUOTE URL:', url.toString())
     const res = await fetch(url.toString())
 
     if (!res.ok) {
@@ -88,15 +89,27 @@ Deno.serve(async (req: Request) => {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const raw: any[] = await res.json()
+    const raw: any = await res.json()
+    console.log('QUOTE RAW RESPONSE:', JSON.stringify(raw))
 
-    const options = raw.map((item) => ({
-      correo_id: item.correo?.id ?? 0,
-      correo_nombre: item.correo?.nombre ?? '',
-      valor: item.valor,
-      horas_entrega: item.horas_entrega ?? null,
-      fecha_estimada: item.fecha_estimada ?? null,
-    }))
+    // Solo modalidad D (domicilio) — sucursal requiere sucursal_id adicional
+    const seen = new Set<string>()
+    const options = (Array.isArray(raw) ? raw : [])
+      .filter((item: any) => item.modalidad === 'D')
+      .filter((item: any) => {
+        const key = String(item.correo?.id ?? '')
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+      .map((item: any) => ({
+        correo_id: item.correo?.id ?? 0,
+        correo_nombre: item.correo?.nombre ?? '',
+        valor: item.valor,
+        horas_entrega: item.horas_entrega ?? null,
+        fecha_estimada: item.fecha_estimada ?? null,
+        modalidad: item.modalidad ?? 'D',
+      }))
 
     return new Response(JSON.stringify(options), {
       status: 200,

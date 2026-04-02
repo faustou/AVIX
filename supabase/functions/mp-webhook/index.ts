@@ -6,6 +6,114 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+async function getEnvioPackToken(): Promise<string> {
+  const apiKey = Deno.env.get('ENVIOPACK_API_KEY')
+  const secretKey = Deno.env.get('ENVIOPACK_SECRET_KEY')
+  if (!apiKey || !secretKey) throw new Error('Credenciales EnvioPack no configuradas')
+  const res = await fetch('https://api.enviopack.com/auth', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ 'api-key': apiKey, 'secret-key': secretKey }).toString(),
+  })
+  if (!res.ok) throw new Error(`EnvioPack auth error ${res.status}`)
+  const data = await res.json()
+  if (!data.token) throw new Error('EnvioPack auth: token ausente')
+  return data.token as string
+}
+
+const PROVINCIA_MAP: Record<string, string> = {
+  A: 'Salta', B: 'Buenos Aires', C: 'Ciudad Autónoma de Buenos Aires', D: 'San Luis',
+  E: 'Entre Ríos', F: 'La Rioja', G: 'Santiago del Estero', H: 'Chaco', J: 'San Juan',
+  K: 'Catamarca', L: 'La Pampa', M: 'Mendoza', N: 'Misiones', P: 'Formosa',
+  Q: 'Neuquén', R: 'Río Negro', S: 'Santa Fe', T: 'Tucumán', U: 'Chubut',
+  V: 'Tierra del Fuego', W: 'Corrientes', X: 'Córdoba', Y: 'Jujuy', Z: 'Santa Cruz',
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function createEnvioPackShipment(order: any, orderItems: any[]): Promise<string | null> {
+  const depositId = Deno.env.get('ENVIOPACK_DEPOSIT_ID')
+  if (!depositId) throw new Error('ENVIOPACK_DEPOSIT_ID no configurado')
+
+  const token = await getEnvioPackToken()
+  const addr = order.shipping_address
+  const pesoTotal = Math.max(0.5, orderItems.reduce((acc: number, item: any) => acc + (item.products?.peso ?? 0.5) * item.quantity, 0))
+  const referencia = `AVIX-${String(order.id).slice(0, 8).toUpperCase()}`
+
+  const fechaAlta = new Date().toISOString().slice(0, 19).replace('T', ' ')
+
+  // Paso 1: crear el pedido en EnvioPack
+  const pedidoBody = {
+    deposito_id: Number(depositId),
+    correo_id: order.shipping_correo_id,
+    nombre: addr.nombre,
+    apellido: addr.apellido,
+    email: order.email,
+    calle: addr.calle,
+    numero: addr.numero,
+    piso: addr.piso ?? '',
+    departamento: addr.depto ?? '',
+    codigo_postal: addr.cp,
+    localidad: addr.localidad,
+    provincia: PROVINCIA_MAP[addr.provincia] ?? addr.provincia,
+    peso: pesoTotal,
+    referencia,
+    observaciones: referencia,
+    id_externo: referencia,
+    monto: Number(order.total),
+    fecha_alta: fechaAlta,
+  }
+
+  const pedidoRes = await fetch(`https://api.enviopack.com/pedidos?access_token=${token}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(pedidoBody),
+  })
+
+  if (!pedidoRes.ok) {
+    const errText = await pedidoRes.text()
+    throw new Error(`EnvioPack crear pedido error ${pedidoRes.status}: ${errText}`)
+  }
+
+  const pedidoData = await pedidoRes.json()
+  console.log('ENVIOPACK PEDIDO RESPONSE:', JSON.stringify(pedidoData))
+  console.log('PEDIDO BODY ENVIADO:', JSON.stringify({ ...pedidoBody, access_token: '***' }))
+
+  const pedidoId = pedidoData?.id ?? pedidoData?.[0]?.id
+  if (!pedidoId) throw new Error('EnvioPack: no se obtuvo ID del pedido')
+
+  // Paso 2: crear el envío vinculado al pedido
+  const envioBody = {
+    pedido: pedidoId,
+    modalidad: 'D',
+    calle: addr.calle,
+    numero: addr.numero,
+    piso: addr.piso ?? '',
+    depto: addr.depto ?? '',
+    codigo_postal: addr.cp,
+    localidad: addr.localidad,
+    provincia: addr.provincia,
+  }
+  console.log('ENVIO BODY:', JSON.stringify(envioBody))
+  const envioRes = await fetch(
+    `https://api.enviopack.com/envios?access_token=${token}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(envioBody),
+    },
+  )
+
+  if (!envioRes.ok) {
+    const errText = await envioRes.text()
+    throw new Error(`EnvioPack crear envío error ${envioRes.status}: ${errText}`)
+  }
+
+  const envioData = await envioRes.json()
+  console.log('ENVIOPACK ENVIO RESPONSE:', JSON.stringify(envioData))
+
+  return pedidoId ? String(pedidoId) : null
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function sendOrderConfirmationEmail(order: any, orderItems: any[], resendApiKey: string) {
   const addr = order.shipping_address
@@ -113,10 +221,13 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
     const body = await req.json()
+    console.log('WEBHOOK BODY:', JSON.stringify(body))
 
     const paymentId: string | undefined = body?.data?.id ?? body?.id ?? undefined
+    console.log('PAYMENT ID:', paymentId)
 
     if (!paymentId) {
+      console.log('SIN PAYMENT ID, saliendo')
       return new Response('ok', { status: 200 })
     }
 
@@ -167,21 +278,40 @@ Deno.serve(async (req: Request) => {
         })
       }
 
-      // Enviar email de confirmación
-      if (RESEND_API_KEY) {
-        const { data: order } = await supabase
-          .from('orders')
-          .select('email, total, shipping_address, shipping_cost, shipping_carrier')
-          .eq('id', orderId)
-          .single()
+      // Crear envío en EnvioPack
+      const { data: order } = await supabase
+        .from('orders')
+        .select('id, email, total, shipping_address, shipping_cost, shipping_carrier, shipping_correo_id, shipping_modalidad')
+        .eq('id', orderId)
+        .single()
 
-        if (order?.email) {
-          try {
-            await sendOrderConfirmationEmail(order, orderItems ?? [], RESEND_API_KEY)
-          } catch (emailErr) {
-            // El email no es crítico — logueamos pero no fallamos el webhook
-            console.error('Error enviando email de confirmación:', (emailErr as Error).message)
+      console.log('ORDER ENVIO DEBUG:', JSON.stringify({
+        id: orderId,
+        correo_id: order?.shipping_correo_id,
+        has_address: !!order?.shipping_address,
+      }))
+
+      if (order?.shipping_address && order?.shipping_correo_id) {
+        try {
+          const enviopackId = await createEnvioPackShipment(order, orderItems ?? [])
+          if (enviopackId) {
+            await supabase
+              .from('orders')
+              .update({ enviopack_shipment_id: enviopackId })
+              .eq('id', orderId)
           }
+        } catch (shipErr) {
+          // No crítico — logueamos pero no fallamos el webhook
+          console.error('Error creando envío en EnvioPack:', (shipErr as Error).message)
+        }
+      }
+
+      // Enviar email de confirmación
+      if (RESEND_API_KEY && order?.email) {
+        try {
+          await sendOrderConfirmationEmail(order, orderItems ?? [], RESEND_API_KEY)
+        } catch (emailErr) {
+          console.error('Error enviando email de confirmación:', (emailErr as Error).message)
         }
       }
     } else if (payment.status === 'rejected') {

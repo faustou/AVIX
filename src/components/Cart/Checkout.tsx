@@ -175,6 +175,10 @@ export function Checkout({ onShippingCostChange }: Props) {
       {/* CALCULADORA DE ENVÍO */}
       <ShippingCalculator
         onShippingSelect={handleShippingSelect}
+        onCalculate={(cp, provincia) => {
+          setField('cp', cp)
+          setField('provincia', provincia)
+        }}
         cartItems={items.map((i) => ({ peso: i.product.peso }))}
         initialCp={address.cp}
         initialProvincia={address.provincia}

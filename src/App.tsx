@@ -13,6 +13,7 @@ import { ProductGrid } from '@/components/Grid/ProductGrid'
 import { ProductFeed } from '@/components/ProductFeed/ProductFeed'
 import { Cart } from '@/components/Cart/Cart'
 import { HeroVideo } from '@/components/HeroVideo/HeroVideo'
+import { Contacto } from '@/pages/Contacto/Contacto'
 import type { Category } from '@/types'
 
 function AppContent() {
@@ -23,13 +24,15 @@ function AppContent() {
   const [activeCategoryBar, setActiveCategoryBar] = useState<Category | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [showCart, setShowCart] = useState(false)
+  const [showContact, setShowContact] = useState(() => window.location.pathname === '/contacto')
 
   const { products, loading, error } = useProducts(activeCategory)
+
+  const isHome = selectedIndex === null && !showContact
 
   // ── URL sync ──
   const didRestoreFromUrl = useRef(false)
 
-  // Al cargar los productos, abrir el que viene en la URL (una sola vez)
   useEffect(() => {
     if (loading || didRestoreFromUrl.current) return
     const code = new URLSearchParams(window.location.search).get('producto')
@@ -39,15 +42,20 @@ function AppContent() {
     didRestoreFromUrl.current = true
   }, [products, loading])
 
-  // Escuchar el botón "atrás" del browser
   useEffect(() => {
     function handlePopState() {
+      const pathname = window.location.pathname
       const code = new URLSearchParams(window.location.search).get('producto')
-      if (!code) {
+      if (pathname === '/contacto') {
+        setShowContact(true)
         setSelectedIndex(null)
-      } else {
+      } else if (code) {
         const index = products.findIndex((p) => p.code === code)
         if (index !== -1) setSelectedIndex(index)
+        setShowContact(false)
+      } else {
+        setSelectedIndex(null)
+        setShowContact(false)
       }
     }
     window.addEventListener('popstate', handlePopState)
@@ -58,10 +66,18 @@ function AppContent() {
     const code = products[index]?.code
     if (code) window.history.pushState({}, '', `/?producto=${encodeURIComponent(code)}`)
     setSelectedIndex(index)
+    setShowContact(false)
   }
 
   function handleClose() {
     window.history.pushState({}, '', '/')
+    setSelectedIndex(null)
+    setShowContact(false)
+  }
+
+  function handleContactOpen() {
+    window.history.pushState({}, '', '/contacto')
+    setShowContact(true)
     setSelectedIndex(null)
   }
 
@@ -70,7 +86,7 @@ function AppContent() {
       <Nav
         cartCount={cartCount}
         onCartClick={() => setShowCart(true)}
-        showBack={selectedIndex !== null}
+        showBack={selectedIndex !== null || showContact}
         onBackClick={handleClose}
         onLogoClick={() => { handleClose(); setActiveCategoryBar(null); setActiveCategory('new') }}
         dataOverlay={selectedIndex !== null}
@@ -78,9 +94,9 @@ function AppContent() {
         columnDirection={direction}
       />
 
-      {selectedIndex === null && <HeroVideo />}
+      {isHome && <HeroVideo />}
 
-      {selectedIndex === null && (
+      {isHome && (
         <CategoryBar
           active={activeCategoryBar}
           onChange={(id) => {
@@ -96,7 +112,9 @@ function AppContent() {
         />
       )}
 
-      {loading ? (
+      {showContact ? (
+        <Contacto />
+      ) : loading ? (
         <div className={styles.loading} data-testid="loading" />
       ) : error ? (
         <div className={styles.error} data-testid="error">
@@ -105,10 +123,10 @@ function AppContent() {
       ) : selectedIndex === null ? (
         <>
           <ProductGrid
-          products={products}
-          onProductSelect={handleProductSelect}
-          columns={columns}
-        />
+            products={products}
+            onProductSelect={handleProductSelect}
+            columns={columns}
+          />
         </>
       ) : (
         <ProductFeed
@@ -125,21 +143,18 @@ function AppContent() {
 
       {showCart && <Cart onClose={() => setShowCart(false)} />}
 
-      {selectedIndex === null && (
+      {isHome && (
         <footer className={styles.footer} data-testid="grid-footer">
           <nav className={styles.footerLinks} aria-label="Legal links">
             {[
-              { label: 'CONTACT', href: '/contacto' },
-              { label: 'TERMS', href: null },
-              { label: 'PRIVACY', href: null },
-              { label: 'ACCESSIBILITY', href: null },
-              { label: 'DNSMPI', href: null },
-              { label: 'COOKIES', href: null },
-            ].map(({ label, href }, i) => (
+              { label: 'CONTACT', onClick: handleContactOpen },
+              { label: 'TERMS', onClick: null },
+              { label: 'PRIVACY', onClick: null },
+            ].map(({ label, onClick }, i) => (
               <span key={label}>
                 {i > 0 && <span className={styles.footerSep}> · </span>}
-                {href ? (
-                  <a href={href} className={styles.footerLink}>{label}</a>
+                {onClick ? (
+                  <button className={styles.footerLink} onClick={onClick}>{label}</button>
                 ) : (
                   <span className={styles.footerLink}>{label}</span>
                 )}

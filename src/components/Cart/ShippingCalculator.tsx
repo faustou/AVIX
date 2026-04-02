@@ -31,6 +31,7 @@ const PROVINCIAS = [
 
 interface Props {
   onShippingSelect: (option: ShippingOption) => void
+  onCalculate?: (cp: string, provincia: string) => void
   cartItems: { peso?: number | null }[]
   initialCp?: string
   initialProvincia?: string
@@ -38,6 +39,7 @@ interface Props {
 
 export function ShippingCalculator({
   onShippingSelect,
+  onCalculate,
   cartItems,
   initialCp = '',
   initialProvincia = '',
@@ -46,11 +48,12 @@ export function ShippingCalculator({
   const [provincia, setProvincia] = useState(initialProvincia)
   const [loading, setLoading] = useState(false)
   const [options, setOptions] = useState<ShippingOption[]>([])
-  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<number | string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   async function handleCalculate() {
     if (cp.length < 4 || !provincia) return
+    onCalculate?.(cp, provincia)
     setLoading(true)
     setError(null)
     setOptions([])
@@ -154,9 +157,9 @@ export function ShippingCalculator({
 
       {options.length > 0 && (
         <div className={styles.options}>
-          {options.map((opt) => (
+          {options.map((opt, i) => (
             <button
-              key={opt.correo_id}
+              key={`${opt.correo_id}-${i}`}
               type="button"
               className={`${styles.optionCard} ${selectedId === opt.correo_id ? styles.selected : ''}`}
               onClick={() => handleSelect(opt)}

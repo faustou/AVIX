@@ -71,11 +71,12 @@ export interface ShippingAddress {
 }
 
 export interface ShippingOption {
-  correo_id: number
+  correo_id: number | string
   correo_nombre: string
   valor: number
   horas_entrega: number | null
   fecha_estimada: string | null
+  modalidad: string
 }
 
 export interface Order {
